@@ -1,0 +1,31 @@
+{
+  "name": "ss-parser",
+  "version": "0.1.0",
+  "description": "The parser interface for SuperScript",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint --env node lib *.js",
+    "test": "mocha test -R spec -s 1700 -t 150000"
+  },
+  "author": "Rob Ellis",
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {
+    "WNdb": "~3.1.1",
+    "async": "^1.4.2",
+    "async-replace": "^1.0.0",
+    "checksum": "^0.1.1",
+    "debug": "^2.2.0",
+    "deepmerge": "^0.2.10",
+    "eslint": "^1.1.0",
+    "lodash": "^3.10.1",
+    "natural": "^0.2.1",
+    "node-normalizer": "^0.1.1",
+    "sfacts": "0.0.12",
+    "wordnet": "^0.1.2"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "should": "^7.0.4"
+  }
+}
