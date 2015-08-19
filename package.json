@@ -1,8 +1,8 @@
 {
   "name": "ss-parser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The parser interface for SuperScript",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "lint": "eslint --env node lib *.js",
     "test": "mocha test -R spec -s 1700 -t 150000"
