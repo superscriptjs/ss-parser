@@ -1,6 +1,6 @@
 {
   "name": "ss-parser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The parser interface for SuperScript",
   "main": "./lib/index.js",
   "scripts": {
