@@ -116,4 +116,14 @@
     + ~no *
     % * so your first name is *
     - I'm a bit confused.
+
+
+// Dynamic Conversation (gh-206)
++ __start__
+- add state {id=123}
+
+// This should add
+%% (id == 123)
+- winning
+
 < topic

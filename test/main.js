@@ -14,7 +14,7 @@ var findByTrigger = function(data, raw) {
 
 describe('Should Parse Input', function() {
   it("Should be an object", function (done) {
-    parse.loadDirectory('./test/fixtures/main.ss', function(err, result) {
+    parse.loadDirectory('./test/fixtures/dc.ss', function(err, result) {
 
       // Should have the following keys
       ['topics', 'gambits', 'replys', 'checksums'].should.eql(Object.keys(result));
