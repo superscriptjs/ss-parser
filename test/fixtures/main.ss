@@ -96,6 +96,13 @@
 + something else
 - Random reply
 
+// Dynamic Conversation (gh-206)
++ __start__
+- add state {id=123}
+
+// This should add
+%% (id == 123)
+- winning
 
 // GH-133 example from gh issues
 + start
@@ -117,13 +124,5 @@
     % * so your first name is *
     - I'm a bit confused.
 
-
-// Dynamic Conversation (gh-206)
-+ __start__
-- add state {id=123}
-
-// This should add
-%% (id == 123)
-- winning
 
 < topic
