@@ -1,3 +1,12 @@
+> pre
+ + this is in pre
+ - the reply
+< pre
+
+> post
+ + this is in post
+ - the reply
+< post
 
 > topic random2
 
@@ -24,8 +33,6 @@
 - okay we are free
 
 < topic
-
-
 
 > topic:keep random
 
