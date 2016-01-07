@@ -104,6 +104,24 @@
 %% (id == 123)
 - winning
 
+%% (id == 123)
++ ~yes *
+- Awesome
+
+%% (id == 123)
++ ~no *
+- To bad.
+
+%% (id == 456) {
+  + ~no *
+  - To bad.
+
+  + ~yes *
+  - Awesome
+}
+
+
+
 // GH-133 example from gh issues
 + start
 - What is your name?
