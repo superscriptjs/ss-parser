@@ -29,13 +29,10 @@ describe('Should Parse Input', function() {
       // Lets make sure we have a conversations array as well
       var key = Object.keys(result.gambits).pop();
       result.gambits[key].options.conversations.should.have.length(3);
-
       findByTrigger(result, "this is in pre").topic.should.eql("__pre__");
-      // console.log(findByTrigger(result, "this is in pre"))
-      // console.log(result);
+      console.log(result)
 
       done();
-      
     });
   });
 });
