@@ -46,6 +46,10 @@ var test = [
   {test: "baz b foo bar", input: "*(1-2) (a|b) *(1-2)"},
   {test: "baz b foo bar", input: "*~2 (a|b) *~2"},
   
+  {test: "foo is awesome", input: "*(1-3) is (*)"},
+  {test: "foo is", input: "*(1-3) is (*)", assert: false},
+  {test: "is awesome", input: "*(1-3) is (*)", assert: false},
+
 ];
 
 describe("Regex Reply Parse", function() {
