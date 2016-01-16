@@ -42,6 +42,10 @@ var test = [
   {test: "please help me", input: "* (help) *"},
   {test: "pleasehelpme", input: "* help *", assert: false},
   {test: "favorite", input: "* (or) *", assert: false},
+  {test: "baz b foo", input: "*(1-2) (a|b) *(1-2)"},
+  {test: "baz b foo bar", input: "*(1-2) (a|b) *(1-2)"},
+  {test: "baz b foo bar", input: "*~2 (a|b) *~2"},
+  
 ];
 
 describe("Regex Reply Parse", function() {
