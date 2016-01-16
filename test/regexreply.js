@@ -7,7 +7,6 @@ var async = require("async");
 
 var test = [
   {test: "hello", input: "hello"},
-
   // Simple wildcard
   {test: "hello", input: "*"},
   {test: "hello world", input: "*"},
@@ -28,6 +27,7 @@ var test = [
   {test: "hello world", input: "*(1-3)"},
   {test: "hello world", input: "*(1-5) world"},
   {test: "hello world", input: "*(1-2) world *(0-3)"},
+  {test: "hello world boo bar baz buzz bob", input: "*(1-2) world *(0-3)", assert: false},
   {test: "hello world", input: "*(1-2) world *(1-3)", assert: false},
   // Alternates
   {test: "bar", input: "(bar|baz)"},
@@ -55,6 +55,9 @@ describe("Regex Reply Parse", function() {
       rxreply.parse(item.input, {}, function(regexp) {
         debug(regexp);
         var pattern = new RegExp("^" + regexp + "$", "i");
+
+        // console.log(item.test.match(pattern));
+
         if (item.assert === false) {
           pattern.test(item.test).should.be.false();  
         } else {
