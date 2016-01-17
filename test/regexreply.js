@@ -51,6 +51,9 @@ var test = [
   {test: "foo is awesome", input: "*(1-3) is (*)"},
   {test: "foo is", input: "*(1-3) is (*)", assert: false},
   {test: "is awesome", input: "*(1-3) is (*)", assert: false},
+
+  {test: "Is there a way to enjoy running outside in this awful Toronto cold weather? (-17 Celsius with wind chill)", input: "*(2-99)"},
+  {test: "Is there a way to enjoy running outside in this awful Toronto cold weather? (-17 Celsius with wind chill)", input: "*~99"},
 ];
 
 describe("Regex Reply Parse", function() {
