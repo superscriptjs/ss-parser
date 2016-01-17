@@ -25,7 +25,9 @@ var test = [
   // Min Max
   {test: "hello world", input: "*(0-2)"},
   {test: "hello world", input: "*(1-3)"},
-  {test: "hello world", input: "*(1-5) world"},
+  {test: "hello world", input: "*(1-5) world"}, // leading
+  {test: "hello world", input: "hello *(1-5)"}, // trailing
+  {test: "hello world", input: "hello *(0-2)"},
   {test: "hello world", input: "*(1-2) world *(0-3)"},
   {test: "hello world boo bar baz buzz bob", input: "*(1-2) world *(0-3)", assert: false},
   {test: "hello world", input: "*(1-2) world *(1-3)", assert: false},
@@ -49,7 +51,6 @@ var test = [
   {test: "foo is awesome", input: "*(1-3) is (*)"},
   {test: "foo is", input: "*(1-3) is (*)", assert: false},
   {test: "is awesome", input: "*(1-3) is (*)", assert: false},
-
 ];
 
 describe("Regex Reply Parse", function() {
@@ -59,8 +60,6 @@ describe("Regex Reply Parse", function() {
       rxreply.parse(item.input, {}, function(regexp) {
         debug(regexp);
         var pattern = new RegExp("^" + regexp + "$", "i");
-
-        // console.log(item.test.match(pattern));
 
         if (item.assert === false) {
           pattern.test(item.test).should.be.false();  
