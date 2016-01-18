@@ -25,6 +25,7 @@ var test = [
   // Min Max
   {test: "hello world", input: "*(0-2)"},
   {test: "hello world", input: "*(1-3)"},
+  {test: "hello", input: "*(2-5)", assert: false},
   {test: "hello world", input: "*(1-5) world"}, // leading
   {test: "hello world", input: "hello *(1-5)"}, // trailing
   {test: "hello world", input: "hello *(0-2)"},
