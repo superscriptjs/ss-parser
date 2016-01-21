@@ -5,7 +5,6 @@ var parse = require("../lib/")();
 
 var findByTrigger = function(data, raw) {
   for (var gam in data.gambits) {
-    console.log(data.gambits[gam].raw)
     if (data.gambits[gam].raw === raw) {
       return data.gambits[gam];
     }
@@ -30,7 +29,7 @@ describe('Should Parse Input', function() {
       var key = Object.keys(result.gambits).pop();
       result.gambits[key].options.conversations.should.have.length(3);
       findByTrigger(result, "this is in pre").topic.should.eql("__pre__");
-      console.log(result)
+      // console.log(result)
 
       done();
     });

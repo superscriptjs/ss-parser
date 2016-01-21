@@ -7,6 +7,8 @@ var async = require("async");
 
 var test = [
   {test: "hello", input: "hello"},
+  {test: "__define_flow__", input: "*"},
+  
   // Simple wildcard
   {test: "hello", input: "*"},
   {test: "hello world", input: "*"},
@@ -26,6 +28,7 @@ var test = [
   {test: "hello world", input: "*(0-2)"},
   {test: "hello world", input: "*(1-3)"},
   {test: "hello", input: "*(2-5)", assert: false},
+  {test: "x is related to y", input: "*(1-5) is related to *(1-5)"},
   {test: "hello world", input: "*(1-5) world"}, // leading
   {test: "hello world", input: "hello *(1-5)"}, // trailing
   {test: "hello world", input: "hello *(0-2)"},
