@@ -37,6 +37,7 @@ var test = [
   {test: "hello world", input: "*(1-2) world *(1-3)", assert: false},
   {test: "~emohello world", input: "*(1-2) world"},
   {test: "world ~emohello", input: "world *(1-2)"},
+  {test: "a b c d:e f", input: "a *(2-10)"},
 
   // Alternates
   {test: "bar", input: "(bar|baz)"},
