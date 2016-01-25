@@ -10,25 +10,27 @@ var test = [
   {test: "__define_flow__", input: "*"},
   
   // Simple wildcard
-  {test: "hello", input: "*"},
-  {test: "hello world", input: "*"},
+  {test: "hello", input: "*", matches: ["hello"]},
+  {test: "hello world", input: "*", matches: ["hello world"]},
   {test: "hello *", input: "hello *"},
   // Variable Length Wildcards
-  {test: "hello world", input: "hello *~1"},
+  {test: "hello world", input: "hello *~1", matches: ["world"]},
   {test: "hello world", input: "hello *~5"},
   {test: "hello world", input: "hello world *~1"},
   {test: "hello world", input: "hello *~1 world"},
   {test: "hello world", input: "*~1 world"},
   // Exact Length Wildcards
-  {test: "hello world", input: "hello *1"},
+  {test: "hello world", input: "hello *1", matches: ["world"]},
   {test: "hello world", input: "hello world *1", assert: false},
   {test: "hello world", input: "*3", assert: false},
   {test: "hello world", input: "*2"},
   // Min Max
-  {test: "hello world", input: "*(0-2)"},
+
+  {test: "who is on Brandon's team", input: "who is on *(1-3) team",},
+  {test: "hello world", input: "*(0-2)", matches: ["hello hello"]},
   {test: "hello world", input: "*(1-3)"},
   {test: "hello", input: "*(2-5)", assert: false},
-  {test: "x is related to y", input: "*(1-5) is related to *(1-5)"},
+  {test: "x is related to y", input: "*(1-5) is related to *(1-5)", matches: ["x", "y"]},
   {test: "hello world", input: "*(1-5) world"}, // leading
   {test: "hello world", input: "hello *(1-5)"}, // trailing
   {test: "hello world", input: "hello *(0-2)"},
@@ -78,6 +80,14 @@ describe("Regex Reply Parse", function() {
           pattern.test(item.test).should.be.true();
         }
         
+        if (item.matches) {
+          var matches = item.test.match(pattern);
+          if (matches) {
+            matches.should.contain(item.matches);
+          }
+
+        }
+
         done();
         next();
       });
@@ -88,3 +98,5 @@ describe("Regex Reply Parse", function() {
     console.log("Done")
   });
 });
+
+
