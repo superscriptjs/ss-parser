@@ -4,11 +4,12 @@ var should = require("should");
 var debug = require("debug")("suite");
 var rxreply = require("../lib/regexreply");
 var async = require("async");
+var _ = require("lodash");
 
 var test = [
   {test: "hello", input: "hello"},
   {test: "__define_flow__", input: "*"},
-  
+
   // Simple wildcard
   {test: "hello", input: "*", matches: ["hello"]},
   {test: "hello world", input: "*", matches: ["hello world"]},
@@ -27,7 +28,7 @@ var test = [
   // Min Max
 
   {test: "who is on Brandon's team", input: "who is on *(1-3) team",},
-  {test: "hello world", input: "*(0-2)", matches: ["hello hello"]},
+  {test: "hello world", input: "*(0-2)", matches: ["hello world"]},
   {test: "hello world", input: "*(1-3)"},
   {test: "hello", input: "*(2-5)", assert: false},
   {test: "x is related to y", input: "*(1-5) is related to *(1-5)", matches: ["x", "y"]},
@@ -57,7 +58,7 @@ var test = [
   {test: "baz b foo", input: "*(1-2) (a|b) *(1-2)"},
   {test: "baz b foo bar", input: "*(1-2) (a|b) *(1-2)"},
   {test: "baz b foo bar", input: "*~2 (a|b) *~2"},
-  
+
   {test: "foo is awesome", input: "*(1-3) is (*)"},
   {test: "foo is", input: "*(1-3) is (*)", assert: false},
   {test: "is awesome", input: "*(1-3) is (*)", assert: false},
@@ -75,15 +76,15 @@ describe("Regex Reply Parse", function() {
         var pattern = new RegExp("^" + regexp + "$", "i");
 
         if (item.assert === false) {
-          pattern.test(item.test).should.be.false();  
+          pattern.test(item.test).should.be.false();
         } else {
           pattern.test(item.test).should.be.true();
         }
-        
+
         if (item.matches) {
           var matches = item.test.match(pattern);
           if (matches) {
-            matches.should.contain(item.matches);
+            matches.should.containDeep(item.matches);
           }
 
         }
