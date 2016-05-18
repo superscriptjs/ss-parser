@@ -46,11 +46,17 @@ var test = [
   {test: "bar", input: "(bar|baz)"},
   {test: "baz", input: "(bar|baz)"},
   {test: "a b d", input: "a (b|c) d"},
+  
   // Optional
   {test: "foo bar baz", input: "foo [bar] baz"},
   {test: "foo bar baz", input: "foo [bar] [baz] [buz]"},
   {test: "foo bar baz", input: "foo [bar|baz] [buz]", assert: false},
+  
   // Advanced
+  {test: "fine", input: "[*] (fine|good) [*]"},
+  {test: "ok fine", input: "[*] (fine|good) [*]"},
+  {test: "sure fine okay", input: "[*] (fine|good) [*]"},
+
   {test: "please help me", input: "* help *"},
   {test: "please help me", input: "* (help) *"},
   {test: "pleasehelpme", input: "* help *", assert: false},
