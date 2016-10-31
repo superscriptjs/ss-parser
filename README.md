@@ -3,6 +3,21 @@
 [![Code Climate](https://codeclimate.com/github/superscriptjs/ss-parser/badges/gpa.svg)](https://codeclimate.com/github/superscriptjs/ss-parser)
 
 # ss-parser
-SuperScript Parser is the interface for reading ss files and creating a internal representation for the superscript dialogue engine.
+
+SuperScript parser is the interface for reading `*.ss` files and creating a internal representation for the SuperScript dialogue engine.
 
 More information can be found at [superscriptjs.com](http://superscriptjs.com)
+
+# API
+
+* `loadDirectory(path, options, callback)`
+
+Takes a directory path and parses all the `*.ss` files in the directory, creating a JSON structure which is passed into callback as `callback(err, results)`. The `options` parameter is an object that can accept a factSystem for use in trigger and reply expansion, and a cache to skip previously parsed files in a directory.
+
+* `parseFile(fileName, factSystem, callback)`
+
+Like `loadDirectory`, but parses a single `*.ss` file.
+
+* `parseContents(file, factSystem, callback)`
+
+Like `parseFile`, but parses a string (i.e. the contents of a single file).

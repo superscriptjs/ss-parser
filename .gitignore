@@ -2,3 +2,4 @@ node_modules/*
 systemDB
 *.log
 coverage/*
+lib/*
