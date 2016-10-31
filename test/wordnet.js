@@ -1,17 +1,17 @@
-var mocha = require("mocha");
-var should = require("should");
-var wordnet = require("../lib/wordnet");
+import mocha from 'mocha';
+import should from 'should';
+import wordnet from '../src/wordnet';
 
-describe('Wordnet', function() {
-  it("Should define a word.", function (done) {
-    wordnet.define("sit", function(err, results){
+describe('Wordnet', () => {
+  it('Should define a word.', (done) => {
+    wordnet.define('sit', (err, results) => {
       should.not.exist(err);
       results.should.not.be.empty;
       done();
     });
   });
-  it("Should explore a word.", function (done) {
-    wordnet.explore("sit", function(err, results){
+  it('Should explore a word.', (done) => {
+    wordnet.explore('sit', (err, results) => {
       should.not.exist(err);
       done();
     });
