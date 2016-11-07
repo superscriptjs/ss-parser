@@ -59,14 +59,14 @@
 + something random
 - What is your favorite color?
 
-  + *1 
+  + *1
   % What is your favorite color?
   - <cap> is mine too.
 
   + (blue|green)
   % What is your favorite color?
   - I hate that color.
-    
+
 
 + test complex
 - reply test {@__complex__}

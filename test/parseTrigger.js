@@ -1,11 +1,10 @@
-import mocha from 'mocha';
+/* global describe, it */
+
 import should from 'should';
-import debuglog from 'debug';
 import async from 'async';
+import norm from 'node-normalizer';
 
-import regexReply from '../src/regexReply';
-
-const debug = debuglog('TestSuite');
+import { normalizeTrigger } from '../src/parseContents';
 
 const test = [
   { test: 'hello', input: 'hello' },
@@ -72,25 +71,42 @@ const test = [
 
   { test: 'Is there a way to enjoy running outside in this awful Toronto cold weather? (-17 Celsius with wind chill)', input: '*(2-99)' },
   { test: 'Is there a way to enjoy running outside in this awful Toronto cold weather? (-17 Celsius with wind chill)', input: '*~99' },
+
+  { test: 'anything', input: '\\*', assert: false },
+  { test: '*', input: '\\*' },
 ];
 
 describe('Regex Reply Parse', () => {
-  const itor = function (item, next) {
+  const itor = (item, next) => {
     it(`Test '${item.test}' '${item.input}' should be ${item.assert === false ? 'false' : 'true'}`, (done) => {
-      regexReply.parse(item.input, {}, (regexp) => {
-        debug(regexp);
-        const pattern = new RegExp(`^${regexp}$`, 'i');
+      normalizeTrigger(item.input, null, (err, cleanTrigger) => {
+        const pattern = new RegExp(`^${cleanTrigger}$`, 'i');
+        const cleanTest = norm.clean(item.test);
+        item.assert = !(item.assert === false);
+
+        if (pattern.test(item.test) !== item.assert && pattern.test(cleanTest) !== item.assert) {
+          console.log(`Non-clean trigger: ${item.input}`);
+          console.log(`Clean trigger: ${cleanTrigger}`);
+          console.log(`Non-clean test input: ${item.test}`);
+          console.log(`Clean test input: ${cleanTest}`);
+        }
 
         if (item.assert === false) {
-          pattern.test(item.test).should.be.false();
+          (pattern.test(item.test) || pattern.test(cleanTest)).should.be.false();
         } else {
-          pattern.test(item.test).should.be.true();
+          (pattern.test(item.test) || pattern.test(cleanTest)).should.be.true();
         }
 
         if (item.matches) {
           const matches = item.test.match(pattern);
-          if (matches) {
-            matches.should.containDeep(item.matches);
+          const matchesClean = cleanTest.match(pattern);
+          if (matches || matchesClean) {
+            // Try matching clean test first, if it fails, try the non-clean one
+            try {
+              matchesClean.should.containDeep(item.matches);
+            } catch (e) {
+              matches.should.containDeep(item.matches);
+            }
           }
         }
 

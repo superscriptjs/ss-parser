@@ -1,11 +1,12 @@
-import mocha from 'mocha';
+/* global describe, it */
+
 import should from 'should';
 
 import parser from '../src';
 
 const findByTrigger = function findByTrigger(data, raw) {
   for (const gam in data.gambits) {
-    if (data.gambits[gam].raw === raw) {
+    if (data.gambits[gam].trigger.raw === raw) {
       return data.gambits[gam];
     }
   }
@@ -13,12 +14,12 @@ const findByTrigger = function findByTrigger(data, raw) {
 
 describe('Should Parse Input', () => {
   it('Should be an object', (done) => {
-    parser.loadDirectory('./test/fixtures/main.ss', (err, result) => {
+    parser.loadDirectory(`${__dirname}/fixtures/main.ss`, (err, result) => {
       // Should have the following keys
-      ['topics', 'gambits', 'conditions', 'replies', 'checksums'].should.eql(Object.keys(result));
+      ['topics', 'gambits', 'replies', 'checksums'].should.eql(Object.keys(result));
 
       // We should have 4 topics
-      ['random', '__pre__', '__post__', 'random2'].should.eql(Object.keys(result.topics));
+      ['__pre__', '__post__', 'random2', 'random'].should.eql(Object.keys(result.topics));
 
       // We should have some gambits
       Object.keys(result.gambits).should.have.length(35);
@@ -26,9 +27,15 @@ describe('Should Parse Input', () => {
 
       // Lets make sure we have a conversations array as well
       const key = Object.keys(result.gambits).pop();
-      result.gambits[key].options.conversations.should.have.length(3);
+      result.gambits[key].conversation.should.have.length(3);
       findByTrigger(result, 'this is in pre').topic.should.eql('__pre__');
 
+      done();
+    });
+  });
+
+  it('Should parse comprehensive script of features', (done) => {
+    parser.loadDirectory(`${__dirname}/fixtures/parserFeatures.ss`, (err, result) => {
       done();
     });
   });

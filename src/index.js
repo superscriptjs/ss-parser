@@ -2,9 +2,9 @@ import fs from 'fs';
 import async from 'async';
 import _ from 'lodash';
 import checksum from 'checksum';
+import recursive from 'recursive-readdir';
 
-import parseContents from './parseContents';
-import Utils from './utils';
+import { parseContents, normalizeTrigger } from './parseContents';
 
 const parseFile = function parseFile(fileName, factSystem, callback) {
   fs.readFile(fileName, 'utf-8', (err, file) => {
@@ -29,8 +29,10 @@ const loadDirectory = function loadDirectory(path, options, callback) {
 
   const startTime = new Date().getTime();
 
-  Utils.walk(path, (err, files) => {
-    if (err) {
+  recursive(path, (err, files) => {
+    if (err && err.code === 'ENOTDIR') {
+      files = [path];
+    } else if (err) {
       console.error(err);
     }
 
@@ -70,19 +72,16 @@ const loadDirectory = function loadDirectory(path, options, callback) {
         let topics = {};
         let gambits = {};
         let replies = {};
-        let conditions = {};
 
         for (let i = 0; i < res.length; i++) {
           topics = _.merge(topics, res[i].topics);
           gambits = _.merge(gambits, res[i].gambits);
-          conditions = _.merge(conditions, res[i].conditions);
           replies = _.merge(replies, res[i].replies);
         }
 
         const data = {
           topics,
           gambits,
-          conditions,
           replies,
           checksums,
         };
@@ -91,13 +90,11 @@ const loadDirectory = function loadDirectory(path, options, callback) {
         const topicCount = Object.keys(topics).length;
         const gambitsCount = Object.keys(gambits).length;
         const repliesCount = Object.keys(replies).length;
-        const conditionCount = Object.keys(conditions).length;
 
         console.log(`Time to Process: ${(endTime - startTime) / 1000} seconds`);
         // console.log("Number of topics %s parsed.", topicCount);
         // console.log("Number of gambits %s parsed.", gambitsCount);
         // console.log("Number of replies %s parsed.", repliesCount);
-        // console.log("Number of conditions %s parsed.", conditionCount);
 
         if (topicCount === 0 && gambitsCount === 0 && repliesCount === 0) {
           callback(null, {});
@@ -110,6 +107,7 @@ const loadDirectory = function loadDirectory(path, options, callback) {
 };
 
 export default {
+  normalizeTrigger,
   parseFile,
   parseContents,
   loadDirectory,

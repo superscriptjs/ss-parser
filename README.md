@@ -21,3 +21,7 @@ Like `loadDirectory`, but parses a single `*.ss` file.
 * `parseContents(file, factSystem, callback)`
 
 Like `parseFile`, but parses a string (i.e. the contents of a single file).
+
+* `normalizeTrigger(trigger, factSystem, callback)`
+
+Takes a trigger string (for example, 'I like * and *~1, but not [cats|dogs].') and generates the regex for the trigger, which is passed into callback as `callback(err, cleanedTrigger)`.
