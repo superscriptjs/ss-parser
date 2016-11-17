@@ -6,6 +6,10 @@ import recursive from 'recursive-readdir';
 
 import { parseContents, normalizeTrigger } from './parseContents';
 
+// Whenever a breaking change occurs, update this version number and the corresponding
+// supported version number in SuperScript
+const VERSION_NUMBER = 1;
+
 const parseFile = function parseFile(fileName, factSystem, callback) {
   fs.readFile(fileName, 'utf-8', (err, file) => {
     if (err) {
@@ -84,6 +88,7 @@ const loadDirectory = function loadDirectory(path, options, callback) {
           gambits,
           replies,
           checksums,
+          version: VERSION_NUMBER,
         };
 
         const endTime = new Date().getTime();

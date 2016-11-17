@@ -7,3 +7,4 @@ test/*
 .eslintrc
 .travis.yml
 readme.md
+.github/*

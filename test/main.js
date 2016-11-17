@@ -16,7 +16,7 @@ describe('Should Parse Input', () => {
   it('Should be an object', (done) => {
     parser.loadDirectory(`${__dirname}/fixtures/main.ss`, (err, result) => {
       // Should have the following keys
-      ['topics', 'gambits', 'replies', 'checksums'].should.eql(Object.keys(result));
+      ['topics', 'gambits', 'replies', 'checksums', 'version'].should.eql(Object.keys(result));
 
       // We should have 4 topics
       ['__pre__', '__post__', 'random2', 'random'].should.eql(Object.keys(result.topics));
