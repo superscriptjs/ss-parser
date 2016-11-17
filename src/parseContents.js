@@ -202,17 +202,33 @@ const postprocess = function postprocess(data, factSystem, callback) {
   normalizeTriggers(cleanData, factSystem, callback);
 };
 
-const parseContents = function parseContents(code, factSystem, callback) {
+const parseContents = function parseContents(code, fileName, factSystem, callback) {
+  // Maintain backward compat.
+  if (arguments.length === 3) {
+    callback = factSystem;
+    factSystem = fileName;
+    fileName = "Unknown File";
+  }
+
   if (code.trim() === '') {
     return callback(null, {});
   }
   const preprocessed = preprocess(code);
-  const parsed = parser.parse(preprocessed);
-  postprocess(parsed, factSystem, (err, postprocessed) => {
-    // Uncomment to debug the output of parseContents
-    // fs.writeFileSync(`${__dirname}/../main.ss`, JSON.stringify(postprocessed, null, 2));
-    callback(err, postprocessed);
-  });
+  try {
+    const parsed = parser.parse(preprocessed);
+    postprocess(parsed, factSystem, (err, postprocessed) => {
+      // Uncomment to debug the output of parseContents
+      // fs.writeFileSync(`${__dirname}/../main.ss`, JSON.stringify(postprocessed, null, 2));
+      callback(err, postprocessed);
+    });
+  } catch (e) {
+    console.log("Error in parser");
+    console.log("Found:", e.found);
+    console.log(e.message);
+    console.log("Line: '%s'", preprocessed.split("\n")[e.location.start.line]);
+    console.log("File: '%s'", fileName);
+    callback("PegParseError");
+  }
 };
 
 export {

@@ -11,11 +11,11 @@ import { parseContents, normalizeTrigger } from './parseContents';
 const VERSION_NUMBER = 1;
 
 const parseFile = function parseFile(fileName, factSystem, callback) {
-  fs.readFile(fileName, 'utf-8', (err, file) => {
+  fs.readFile(fileName, 'utf-8', (err, contents) => {
     if (err) {
       console.error(`Error reading file: ${err}`);
     }
-    parseContents(file, factSystem, callback);
+    parseContents(contents, fileName, factSystem, callback);
   });
 };
 
