@@ -2,7 +2,7 @@ import peg from 'pegjs';
 import fs from 'fs';
 import _ from 'lodash';
 import async from 'async';
-import norm from 'node-normalizer';
+import lang from 'bot-lang'
 import replace from 'async-replace';
 import debuglog from 'debug';
 
@@ -104,8 +104,8 @@ const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, 
 };
 
 const normalizeTrigger = function normalizeTrigger(trigger, factSystem, callback) {
-  let cleanTrigger = norm.clean(trigger);
-//  console.log(`Normalizing: '${trigger}' into '${cleanTrigger}'`);
+  // let cleanTrigger = norm.clean(trigger);
+  let cleanTrigger = lang.replace.all(trigger);
   cleanTrigger = triggerParser.parse(cleanTrigger).clean;
   expandWordnetTrigger(cleanTrigger, factSystem, (err, cleanTrigger) => {
     callback(err, cleanTrigger);

@@ -19,11 +19,11 @@
   "dependencies": {
     "async": "^2.1.2",
     "async-replace": "^1.0.1",
+    "bot-lang": "^1.0.2",
     "checksum": "^0.1.1",
     "debug": "^2.3.0",
     "lodash": "^4.11.1",
     "natural": "^0.4.0",
-    "node-normalizer": "alpha",
     "pegjs": "^0.10.0",
     "recursive-readdir": "^2.1.0",
     "wordnet-db": "^3.1.2",

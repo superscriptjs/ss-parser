@@ -3,6 +3,14 @@
 import should from 'should';
 import async from 'async';
 import norm from 'node-normalizer';
+import lang from 'bot-lang';
+
+// Front loading this rather than lazy loading so we can use `each` over `eachSeries` below.
+lang.util.prepFile("replace/contractions.txt");
+lang.util.prepFile("replace/spellfix.txt");
+lang.util.prepFile("replace/british.txt");
+lang.util.prepFile("replace/substitutes.txt");
+lang.util.prepFile("replace/frivolous.txt");
 
 import { normalizeTrigger } from '../src/parseContents';
 
@@ -81,7 +89,10 @@ describe('Regex Reply Parse', () => {
     it(`Test '${item.test}' '${item.input}' should be ${item.assert === false ? 'false' : 'true'}`, (done) => {
       normalizeTrigger(item.input, null, (err, cleanTrigger) => {
         const pattern = new RegExp(`^${cleanTrigger}$`, 'i');
-        const cleanTest = norm.clean(item.test);
+        
+        // let cleanTest = item.test;
+        let cleanTest = lang.replace.all(item.test);
+        // let cleanTest = norm.clean(item.test);
         item.assert = !(item.assert === false);
 
         if (pattern.test(item.test) !== item.assert && pattern.test(cleanTest) !== item.assert) {
