@@ -82,6 +82,7 @@ const test = [
 
   { test: 'anything', input: '\\*', assert: false },
   { test: '*', input: '\\*' },
+  { test: '__test__', input: '__test__' },
 ];
 
 describe('Regex Reply Parse', () => {
