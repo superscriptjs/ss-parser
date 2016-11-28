@@ -2,7 +2,7 @@ import peg from 'pegjs';
 import fs from 'fs';
 import _ from 'lodash';
 import async from 'async';
-import lang from 'bot-lang'
+import lang from 'bot-lang';
 import replace from 'async-replace';
 import debuglog from 'debug';
 
@@ -104,7 +104,6 @@ const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, 
 };
 
 const normalizeTrigger = function normalizeTrigger(trigger, factSystem, callback) {
-  // let cleanTrigger = norm.clean(trigger);
   let cleanTrigger = lang.replace.all(trigger);
   cleanTrigger = triggerParser.parse(cleanTrigger).clean;
   expandWordnetTrigger(cleanTrigger, factSystem, (err, cleanTrigger) => {
@@ -207,7 +206,7 @@ const parseContents = function parseContents(code, fileName, factSystem, callbac
   if (arguments.length === 3) {
     callback = factSystem;
     factSystem = fileName;
-    fileName = "Unknown File";
+    fileName = 'Unknown File';
   }
 
   if (code.trim() === '') {
@@ -222,12 +221,12 @@ const parseContents = function parseContents(code, fileName, factSystem, callbac
       callback(err, postprocessed);
     });
   } catch (e) {
-    console.log("Error in parser");
-    console.log("Found:", e.found);
+    console.log('Error in parser');
+    console.log('Found:', e.found);
     console.log(e.message);
-    console.log("Line: '%s'", preprocessed.split("\n")[e.location.start.line]);
+    console.log("Line: '%s'", preprocessed.split('\n')[e.location.start.line]);
     console.log("File: '%s'", fileName);
-    callback("PegParseError");
+    callback('PegParseError');
   }
 };
 
