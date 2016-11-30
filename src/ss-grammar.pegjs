@@ -33,13 +33,17 @@ start
       return data;
     }
 
+argCharacter
+  = "\\" char:[()] { return char; }
+  / !")" char:. { return char; }
+
 args
-  = ws* arg1:[^\n\r \t,()]+ ws* args:("," ws* arg:[^\n\r \t,()]+ ws* { return `, ${arg.join("")}`; })*
-    { return arg1.join("").concat(args.join("")); }
+  = argChars:argCharacter+
+    { return argChars.join(""); }
 
 filter
-  = "^" filter:[a-zA-Z0-9_]+ "(" ws* args:args? ws* ")"
-    { return `^${filter.join("")}(${args ? args : ''})`; }
+  = "^" filter:[a-zA-Z0-9_]+ "(" args:args? ")"
+    { return `^${filter.join("")}(${args || ''})`; }
 
 topickeyword
   = keyword:[a-zA-Z_]+ { return keyword.join(""); }
