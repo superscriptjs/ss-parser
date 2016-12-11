@@ -48,3 +48,6 @@ comment
 
 ? question outside topic *
 - yeah
+
++ {replies_ordered} question outside topic *
+- yeah

@@ -48,6 +48,14 @@ topicflagvalues
   / "nostay" { return "nostay"; }
   / "system" { return "system"; }
 
+replyoptionvalue
+  = "replies_ordered" { return "replies_ordered"; }
+  / "replies_random" { return "replies_random"; }
+  / "replies_reload" { return "replies_reload"; }
+
+replyoptions
+  = "{" ws? replyvalue:replyoptionvalue ws? "}" { return replyvalue; }
+
 topicflag
   = ":" flag:topicflagvalues { return flag; }
 
@@ -109,9 +117,10 @@ redirect
   = ws* "@ " redirect:[a-zA-Z_ ]+ { return redirect.join(""); }
 
 trigger
-  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
+  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:(reply_options:replyoptions { return reply_options; })? ws* tokens:[^\n\r]+
   {
     return {
+      reply_options: reply_options,
       filter: filter,
       question: null,
       raw: tokens.join("")
