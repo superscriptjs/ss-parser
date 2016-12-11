@@ -83,6 +83,7 @@ const test = [
   { test: 'anything', input: '\\*', assert: false },
   { test: '*', input: '\\*' },
   { test: '__test__', input: '__test__' },
+  { test: 'redirect testconversation trigger two', input: 'redirect *1 (*)' },
 ];
 
 describe('Regex Reply Parse', () => {
