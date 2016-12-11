@@ -144,7 +144,7 @@ reply
     {
       var replyString = string.join("");
       if (replyExtension) {
-        replyExtension.forEach((extension) => replyString = replyString.concat(`\n${extension}`));
+        replyExtension.forEach((extension) => replyString = replyString.concat(`${extension}`));
       }
       return replyString;
     }
