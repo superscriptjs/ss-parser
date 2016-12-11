@@ -32,7 +32,7 @@ comment
 + here's a redirect
 @ go here
 
-+ ^filterme() this one is a filter
++ {^filterme()} this one is a filter
 - yeah!
 
 + yo there, how's it going?? i'm *(2, 2)! hi...!

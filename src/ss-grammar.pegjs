@@ -2,18 +2,6 @@
   function makeInteger(o) {
     return parseInt(o.join(""), 10);
   }
-
-  function starminmax(min, max) {
-    var expression;
-    if (min === max) {
-      return `\\s*(\\s?(?:[\\w-:]*\\??\\.?\\,?\\s*\\~?\\(?\\)?){0,${min}})`;
-    } else if (min < 2) {
-      expression = "\\s*((?:\\(?\\~?[\\w-:]+[\\?\\.\\'\\,\\s\\~\\)]*?)";
-    } else {
-      expression = "\\s*((?:\\(?\\~?[\\w-:]+[\\?\\.\\'\\,\\s\\~\\)]+[\\w-:]+[\\?\\.\\'\\,\\s\\~\\)]*?)";
-    }
-    return `${expression}{${min},${max}})\\s?`;
-  }
 }
 
 start
@@ -41,7 +29,11 @@ args
   = argChars:argCharacter+
     { return argChars.join(""); }
 
-filter
+gambitfilter
+  = "{^" filter:[a-zA-Z0-9_]+ "(" args:args? ")}"
+    { return `^${filter.join("")}(${args || ''})`; }
+
+topicfilter
   = "^" filter:[a-zA-Z0-9_]+ "(" args:args? ")"
     { return `^${filter.join("")}(${args || ''})`; }
 
@@ -63,8 +55,8 @@ topicflags
   = flag:topicflag* { return flag; }
 
 topicoptions
-  = ws+ filter:filter ws* keywords:topickeywords? { return { keywords: keywords || [], filter: filter }; }
-  / ws+ keywords:topickeywords ws* filter:filter? { return { keywords: keywords, filter: filter }; }
+  = ws+ filter:topicfilter ws* keywords:topickeywords? { return { keywords: keywords || [], filter: filter }; }
+  / ws+ keywords:topickeywords ws* filter:topicfilter? { return { keywords: keywords, filter: filter }; }
 
 topic
   = ws* "> topic"
@@ -127,7 +119,7 @@ question
     { return { questionType, questionSubtype } }
 
 trigger
-  = ws* "+" ws+ filter:(filter:filter ws+ { return filter; })? ws* tokens:[^\n\r]+
+  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
   {
     return {
       filter: filter,
@@ -135,7 +127,7 @@ trigger
       raw: tokens.join("")
     };
   }
-  / ws* "?" question:question? ws+ filter:(filter:filter ws+ { return filter; })? ws* tokens:[^\n\r]+
+  / ws* "?" question:question? ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
   {
     return {
       filter: filter,
@@ -152,7 +144,7 @@ reply
     {
       var replyString = string.join("");
       if (replyExtension) {
-        replyExtension.forEach((extension) => replyString = replyString.concat(`${extension}`));
+        replyExtension.forEach((extension) => replyString = replyString.concat(`\n${extension}`));
       }
       return replyString;
     }

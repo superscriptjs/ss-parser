@@ -4,15 +4,13 @@
   }
 
   function starminmax(min, max) {
-    var expression;
-    if (min === max) {
-      return `\\s*(\\s?(?:[\\w-:]*\\??\\.?\\,?\\s*\\~?\\(?\\)?){0,${min}})`;
-    } else if (min < 2) {
-      expression = "\\s*((?:\\(?\\~?[\\w-:]+[\\?\\.\\'\\,\\s\\~\\)]*?)";
+    min = parseInt(min, 10);
+    max = parseInt(max, 10);
+    if (min === 0) {
+      return `\\s*((?:[^\\s]+\\s+){${min},${max - 1}}(?:[^\\s]+)?)\\s*`;
     } else {
-      expression = "\\s*((?:\\(?\\~?[\\w-:]+[\\?\\.\\'\\,\\s\\~\\)]+[\\w-:]+[\\?\\.\\'\\,\\s\\~\\)]*?)";
+      return `\\s*((?:[^\\s]+\\s+){${min - 1},${max - 1}}(?:[^\\s]+))\\s*`;
     }
-    return `${expression}{${min},${max}})\\s?`;
   }
 }
 
@@ -24,17 +22,17 @@ star
   / "(" ws* "*" ws* ")" { return { raw: "(*)", clean: "\\s(.*)\\s" }; }
 
 starn
-  = "*" val:integer { return { raw: `*${val}`, clean: `(\\S+(?:\\s+\\S+){${parseInt(val) - 1}})` }; }
-  / "*(" val:integer ")" { return { raw: `*(${val})`, clean: `(\\S+(?:\\s+\\S+){${parseInt(val) - 1}})` }; }
+  = "*" val:integer { return { raw: `*${val}`, clean: starminmax(val, val) }; }
+  / "*(" val:integer ")" { return { raw: `*(${val})`, clean: starminmax(val, val) }; }
 
 starupton
-  = "*~" val:integer { return { raw: `*~${val}`, clean: `\\s*(\\s?(?:[\\w-:~]*\\??\\.?\\,?\\s*\\~?\\(?\\)?){0,${parseInt(val)}})` }; }
+  = "*~" val:integer { return { raw: `*~${val}`, clean: starminmax(0, val) }; }
 
 starminmax
-  = "*(" ws1:ws* min:integer ws2:ws* "," ws3:ws* max:integer ws4:ws* ")"
-    { return { raw: `*(${ws1}${min}${ws2},${ws3}${max}${ws4})`, clean: starminmax(parseInt(min), parseInt(max)) }; }
-  / "*(" ws1:ws* min:integer ws2:ws* "-" ws3:ws* max:integer ws4:ws* ")"
-    { return { raw: `*(${ws1}${min}${ws2},${ws3}${max}${ws4})`, clean: starminmax(parseInt(min), parseInt(max)) }; }
+  = "*(" ws* min:integer ws* "," ws* max:integer ws* ")"
+    { return { raw: `*(${min},${max})`, clean: starminmax(min, max) }; }
+  / "*(" ws* min:integer ws* "-" ws* max:integer ws* ")"
+    { return { raw: `*(${min},${max})`, clean: starminmax(min, max) }; }
 
 string
   = str:[a-zA-Z]+ { return { type: "string", val: str.join("")}; }
