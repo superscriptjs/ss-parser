@@ -1,6 +1,6 @@
 /* global describe, it */
 
-import should from 'should';
+import should from 'should/as-function';
 
 import parser from '../src';
 
@@ -16,19 +16,19 @@ describe('Should Parse Input', () => {
   it('Should be an object', (done) => {
     parser.loadDirectory(`${__dirname}/fixtures/main.ss`, (err, result) => {
       // Should have the following keys
-      ['topics', 'gambits', 'replies', 'checksums', 'version'].should.eql(Object.keys(result));
+      should(Object.keys(result)).eql(['topics', 'gambits', 'replies', 'checksums', 'version']);
 
       // We should have 4 topics
-      ['__pre__', '__post__', 'random2', 'random'].should.eql(Object.keys(result.topics));
+      should(Object.keys(result.topics)).eql(['__pre__', '__post__', 'random2', 'random']);
 
       // We should have some gambits
-      Object.keys(result.gambits).should.have.length(35);
-      Object.keys(result.replies).should.have.length(36);
+      should(Object.keys(result.gambits)).have.length(35);
+      should(Object.keys(result.replies)).have.length(36);
 
       // Lets make sure we have a conversations array as well
       const key = Object.keys(result.gambits).pop();
-      result.gambits[key].conversation.should.have.length(3);
-      findByTrigger(result, 'this is in pre').topic.should.eql('__pre__');
+      should(result.gambits[key].conversation).have.length(3);
+      should(findByTrigger(result, 'this is in pre').topic).eql('__pre__');
 
       done();
     });
