@@ -126,7 +126,7 @@ trigger
       raw: tokens.join("")
     };
   }
-  / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
+  / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:(reply_options:replyoptions { return reply_options; })? ws* tokens:[^\n\r]+
   {
     return {
       filter: filter,
