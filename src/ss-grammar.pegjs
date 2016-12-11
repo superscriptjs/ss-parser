@@ -108,16 +108,6 @@ string
 redirect
   = ws* "@ " redirect:[a-zA-Z_ ]+ { return redirect.join(""); }
 
-questionType
-  = type:[A-Za-z]+ { return type.join(""); }
-
-questionSubtype
-  = subtype:[A-Za-z]+ { return subtype.join(""); }
-
-question
-  = ":" questionType:questionType questionSubtype:(":" questionSubtype:questionSubtype { return questionSubtype; })?
-    { return { questionType, questionSubtype } }
-
 trigger
   = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
   {
@@ -127,11 +117,11 @@ trigger
       raw: tokens.join("")
     };
   }
-  / ws* "?" question:question? ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
+  / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws* tokens:[^\n\r]+
   {
     return {
       filter: filter,
-      question: question || { questionType: null, questionSubtype: null },
+      question: true,
       raw: tokens.join("")
     };
   }
