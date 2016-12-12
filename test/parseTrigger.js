@@ -1,6 +1,6 @@
 /* global describe, it */
 
-import should from 'should';
+import should from 'should/as-function';
 import async from 'async';
 import lang from 'bot-lang';
 
@@ -83,6 +83,7 @@ const test = [
   { test: 'anything', input: '\\*', assert: false },
   { test: '*', input: '\\*' },
   { test: '__test__', input: '__test__' },
+  { test: 'redirect testconversation trigger two', input: 'redirect *1 (*)' },
 ];
 
 describe('Regex Reply Parse', () => {
@@ -102,9 +103,9 @@ describe('Regex Reply Parse', () => {
         }
 
         if (item.assert === false) {
-          (pattern.test(item.test) || pattern.test(cleanTest)).should.be.false();
+          should(pattern.test(item.test) || pattern.test(cleanTest)).be.false();
         } else {
-          (pattern.test(item.test) || pattern.test(cleanTest)).should.be.true();
+          should(pattern.test(item.test) || pattern.test(cleanTest)).be.true();
         }
 
         if (item.matches) {
@@ -113,9 +114,9 @@ describe('Regex Reply Parse', () => {
           if (matches || matchesClean) {
             // Try matching clean test first, if it fails, try the non-clean one
             try {
-              matchesClean.should.containDeep(item.matches);
+              should(matchesClean).containDeep(item.matches);
             } catch (e) {
-              matches.should.containDeep(item.matches);
+              should(matches).containDeep(item.matches);
             }
           }
         }

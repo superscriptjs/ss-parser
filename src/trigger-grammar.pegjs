@@ -18,8 +18,12 @@ start
   = trigger
 
 star
-  = "*" { return { raw: "*", clean: "\\s(?:.*\\s)?" }; }
-  / "(" ws* "*" ws* ")" { return { raw: "(*)", clean: "\\s(.*)\\s" }; }
+  = "*" { return { raw: "*", clean: "(?:(?:^|\\s)(?:.*)(?:\\s|$))?" }; }
+  / "[" ws* "*" ws* "]" { return { raw: "[*]", clean: "(?:(?:^|\\s)(?:.*)(?:\\s|$))?" }; }
+  / "(" ws* "*" ws* ")" { return { raw: "(*)", clean: "(?:^|\\s)(.*)(?:\\s|$)" }; }
+
+// As far as I can tell: * and [*] are equivalent and can be empty, while (*) cannot
+// match to an empty string.
 
 starn
   = "*" val:integer { return { raw: `*${val}`, clean: starminmax(val, val) }; }
@@ -74,42 +78,13 @@ optionals
 EOF
   = !.
 
-// Special-case regexes for first, last and only token.
-// This is necessary since stars have different regexes depending on whether they are
-// at the beginning, in the middle or at the end of a trigger.
-firstToken
-  = ws* "*" ws+
-    { return { raw: '* ', clean: "(?:.*\\s)?" }; }
-  / ws* "[" ws* "*" ws* "]" ws+
-    { return { raw: '[*] ', clean: "(?:.*\\s)?" }; }
-  / ws* "(" ws* "*" ws* ")" ws+
-    { return { raw: '(*) ', clean: "(.*\\s)" }; }
-
-lastToken
-  = ws* "*" ws* EOF
-    { return { raw: ' *', clean: "(?:\\s.*)?" }; }
-  / ws* "[" ws* "*" ws* "]" ws* EOF
-    { return { raw: ' [*]', clean: "(?:\\s.*)?" }; }
-  / ws* "(" ws* "*" ws* ")" ws* EOF
-    { return { raw: ' (*)', clean: "(\\s.*)" }; }
-
-onlyToken
-  = ws* "*" ws* EOF
-    { return { raw: '*', clean: "(?:.*?)" }; }
-  / ws* "[" ws* "*" ws* "]" ws* EOF
-    { return { raw: '*', clean: "(?:.*?)" }; }
-  / ws* "(" ws* "*" ws* ")" ws* EOF
-    { return { raw: '*', clean: "(.*)" }; }
-
 triggerTokens
-  = lastToken:lastToken
-    { return lastToken; }
-  / alternates:alternates
+  = alternates:alternates
     { return alternates; }
   / wsl:ws* optionals:optionals wsr:ws*
     { return { raw: `${wsl.join("")}${optionals.raw}${wsr.join("")}`, clean: optionals.clean } }
   / wsl:ws* starn:starn wsr:ws*
-    { return { raw: `${wsl.join("")}${starn.raw}${wsr.join("")}`, clean: `${wsl.join("")}${starn.clean}${wsr.join("")}` }; }
+    { return { raw: `${wsl.join("")}${starn.raw}${wsr.join("")}`, clean: starn.clean }; }
   / wsl:ws* starupton:starupton wsr:ws*
     { return { raw: `${wsl.join("")}${starupton.raw}${wsr.join("")}`, clean: starupton.clean }; }
   / wsl:ws* starminmax:starminmax wsr:ws*
@@ -122,15 +97,11 @@ triggerTokens
     { return { raw: ws, clean: ws }; }
 
 trigger
-  = onlyToken:onlyToken
-    { return onlyToken; }
-  / firstToken:firstToken? tokens:triggerTokens*
+  = tokens:triggerTokens*
     {
-      let raw = firstToken ? firstToken.raw : '';
-      let clean = firstToken ? firstToken.clean : '';
       return {
-        raw: raw.concat(tokens.map((token) => token.raw).join("")),
-        clean: clean.concat(tokens.map((token) => token.clean).join(""))
+        raw: tokens.map((token) => token.raw).join(""),
+        clean: tokens.map((token) => token.clean).join("")
       };
     }
 
