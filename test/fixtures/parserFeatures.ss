@@ -49,5 +49,13 @@ comment
 ? question outside topic *
 - yeah
 
-+ {replies_ordered} question outside topic *
-- yeah
+// reply options
+// keep = ['keep', 'exhaust']
+// order = ['random', 'ordered']
+
++ {keep, ordered} test random
+- reply
+
++ {ordered}{keep} test random 2
+- reply
+

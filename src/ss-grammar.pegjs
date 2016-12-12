@@ -48,13 +48,21 @@ topicflagvalues
   / "nostay" { return "nostay"; }
   / "system" { return "system"; }
 
-replyoptionvalue
-  = "replies_ordered" { return "replies_ordered"; }
-  / "replies_random" { return "replies_random"; }
-  / "replies_reload" { return "replies_reload"; }
+ordervalues
+  = "ordered"
+  / "random"
+
+keepvalues
+  = "keep"
+  / "exhaust"
+
+replyoption
+  = keepvalue:keepvalues { return { keep: keepvalue }; }
+  / ordervalue:ordervalues { return { order: ordervalue }; }
 
 replyoptions
-  = "{" ws? replyvalue:replyoptionvalue ws? "}" { return replyvalue; }
+  = "{" ws* firstOption:replyoption ws* options:("," ws* option:replyoption ws* { return option; })* ws* "}" { return options.concat(firstOption) || []; }
+  / "{" ws* firstOption:replyoption ws* "}" { return firstOption || []; }
 
 topicflag
   = ":" flag:topicflagvalues { return flag; }
@@ -117,18 +125,40 @@ redirect
   = ws* "@ " redirect:[a-zA-Z_ ]+ { return redirect.join(""); }
 
 trigger
-  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:(reply_options:replyoptions { return reply_options; })? ws* tokens:[^\n\r]+
+  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:(reply_options:replyoptions ws* { return reply_options; })* tokens:[^\n\r]+
   {
+    const flatten = list => list.reduce(
+        (a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []
+    );
+    var props = {};
+    if (reply_options && reply_options.length !== 0) {
+      reply_options = flatten(reply_options);
+      for(var i = 0; i < reply_options.length; i++) {
+        var obj1 = reply_options[i];
+        for (var attrname in obj1) { props[attrname] = obj1[attrname]; }
+      }
+    }
     return {
-      reply_options: reply_options,
+      reply_options: props || {},
       filter: filter,
       question: null,
       raw: tokens.join("")
     };
   }
-  / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:(reply_options:replyoptions { return reply_options; })? ws* tokens:[^\n\r]+
+  / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? ws* tokens:[^\n\r]+
   {
+    const flatten = list => list.reduce(
+        (a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []
+    );
+    var props = {};
+    if (reply_options && reply_options.length !== 0) {
+      for(var i = 0; i < reply_options.length; i++) {
+        var obj1 = reply_options[i];
+        for (var attrname in obj1) { props[attrname] = obj1[attrname]; }
+      }
+    }
     return {
+      reply_options: props || {},
       filter: filter,
       question: true,
       raw: tokens.join("")
