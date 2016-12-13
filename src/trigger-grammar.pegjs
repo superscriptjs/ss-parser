@@ -1,9 +1,7 @@
 {
-  function makeInteger(o) {
-    return parseInt(o.join(""), 10);
-  }
+  const makeInteger = (int) => parseInt(int.join(""), 10);
 
-  function starminmax(min, max) {
+  const starminmax = (min, max) => {
     min = parseInt(min, 10);
     max = parseInt(max, 10);
     if (min === 0) {

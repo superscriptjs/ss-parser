@@ -1,18 +1,6 @@
 {
-  function makeInteger(o) {
-    return parseInt(o.join(""), 10);
-  }
-
-  function flattenArrayOfObjects(arr) {
-    var props = {};
-    if (arr && arr.length !== 0) {
-      for(var i = 0; i < arr.length; i++) {
-        var obj1 = arr[i];
-        for (var attrname in obj1) { props[attrname] = obj1[attrname]; }
-      }
-    }
-    return props;
-  }
+  const makeInteger = (int) => parseInt(int.join(""), 10);
+  const merge = (arr) => Object.assign({}, ...arr);
 }
 
 start
@@ -40,24 +28,25 @@ args
   = argChars:argCharacter+
     { return argChars.join(""); }
 
-gambitfilter
-  = "{^" filter:[a-zA-Z0-9_]+ "(" args:args? ")}"
-    { return `^${filter.join("")}(${args || ''})`; }
-
-topicfilter
+filter
   = "^" filter:[a-zA-Z0-9_]+ "(" args:args? ")"
     { return `^${filter.join("")}(${args || ''})`; }
+
+gambitfilter
+  = "{" ws* filter:filter ws* "}"
+    { return filter; }
 
 topickeyword
   = keyword:[a-zA-Z_]+ { return keyword.join(""); }
 
 topickeywords
-  = "(" ws* firstOption:topickeyword ws* options:("," ws* option:topickeyword ws* { return option; })* ws* ")" { return options.concat(firstOption) || []; }
+  = "(" ws* firstOption:topickeyword ws* options:("," ws* option:topickeyword ws* { return option; })* ws* ")"
+    { return options.concat(firstOption) || []; }
 
 topicflagvalues
-  = "keep" { return "keep"; }
-  / "nostay" { return "nostay"; }
-  / "system" { return "system"; }
+  = "keep"
+  / "nostay"
+  / "system"
 
 ordervalues
   = "ordered"
@@ -72,8 +61,8 @@ replyoption
   / ordervalue:ordervalues { return { order: ordervalue }; }
 
 replyoptions
-  = "{" ws* firstOption:replyoption ws* options:("," ws* option:replyoption ws* { return option; })* ws* "}" { return options.concat(firstOption) || []; }
-  / "{" ws* firstOption:replyoption ws* "}" { return firstOption || []; }
+  = "{" ws* firstOption:replyoption ws* options:("," ws* option:replyoption ws* { return option; })* ws* "}"
+    { return merge([firstOption].concat(options)); }
 
 topicflag
   = ":" flag:topicflagvalues { return flag; }
@@ -81,27 +70,14 @@ topicflag
 topicflags
   = flag:topicflag* { return flag; }
 
+topicoption
+  = filter:filter { return { filter }; }
+  / keywords:topickeywords { return { keywords }; }
+  / replyoptions:replyoptions { return { topic_globals: replyoptions }; }
+
 topicoptions
-
-  // Any two  {random} + any other or {random} (a b c) ^filter()
-  = ws+ reply_options:replyoptions ws* keywords:topickeywords? ws* filter:topicfilter? 
-  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
-
-  // Any two  ^filter() + any other or ^filter() {random} (a b c)
-  / ws+ filter:topicfilter ws* reply_options:replyoptions? ws* keywords:topickeywords?
-  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
-
-  // Any two  {random} + any other or {random} ^filter() (a b c)
-  / ws+ reply_options:replyoptions ws* filter:topicfilter? ws* keywords:topickeywords?
-  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
-  
-  // Any two  (a b c) + any other or (a b c) {random} ^filter()
-  / ws+ keywords:topickeywords ws* reply_options:replyoptions ws* filter:topicfilter?
-  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
-
-  // This will match one of any or {random} ^filter() (a b c) 
-  / ws+ reply_options:replyoptions? ws* filter:topicfilter? ws* keywords:topickeywords? 
-  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
+  = options:(ws* option:topicoption { return option; })* ws*
+    { return merge(options); }
 
 topic
   = ws* "> topic"
@@ -158,7 +134,7 @@ trigger
   = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? tokens:[^\n\r]+
   {
     return {
-      reply_options: flattenArrayOfObjects(reply_options),
+      reply_options,
       filter: filter,
       question: null,
       raw: tokens.join("")
@@ -167,7 +143,7 @@ trigger
   / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? ws* tokens:[^\n\r]+
   {
     return {
-      reply_options: flattenArrayOfObjects(reply_options),
+      reply_options,
       filter: filter,
       question: true,
       raw: tokens.join("")
@@ -199,13 +175,13 @@ conditional
       { return string.join(""); }
 
 star
-  = "*" { return { raw: "*", clean: "(?:.*\\s?)" }; }
+  = "*" { return { raw: "*", clean: "(?:(?:^|\\s)(?:.*)(?:\\s|$))?" }; }
 
 conversationTokens
   = string:[^*\n\r \t]+
     { return { raw: string.join(""), clean: `${string.join("")}\\b` };}
   / wsl:ws* star:star wsr:ws*
-    { return { raw: `${wsl.join("")}${star.raw}${wsr.join("")}`, clean: star.clean }; }
+    { return { raw: ` ${star.raw} `, clean: star.clean }; }
   / ws:ws { return { raw: ws, clean: ws }; }
 
 // Do cleaning as a postprocess with the trigger parser
