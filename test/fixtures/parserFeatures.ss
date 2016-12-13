@@ -1,4 +1,4 @@
-> topic:system hello_world {random} (a, b, c) ^filter()
+> topic hello_world {random, system} (a, b, c) ^filter()
 + this is a trigger with a multiline response
 - hello this goes
 ^ over multiple lines
@@ -58,4 +58,3 @@ comment
 
 ? {ordered, keep} test random 2
 - reply
-

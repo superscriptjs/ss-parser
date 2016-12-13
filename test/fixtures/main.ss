@@ -34,7 +34,7 @@
 
 < topic
 
-> topic:keep random
+> topic random {keep}
 
 + i went to highschool
 - did you finish ?

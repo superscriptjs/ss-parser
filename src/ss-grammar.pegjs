@@ -32,67 +32,78 @@ filter
   = "^" filter:[a-zA-Z0-9_]+ "(" args:args? ")"
     { return `^${filter.join("")}(${args || ''})`; }
 
-gambitfilter
+gambitFilter
   = "{" ws* filter:filter ws* "}"
     { return filter; }
 
-topickeyword
+topicKeyword
   = keyword:[a-zA-Z_]+ { return keyword.join(""); }
 
-topickeywords
-  = "(" ws* firstOption:topickeyword ws* options:("," ws* option:topickeyword ws* { return option; })* ws* ")"
-    { return options.concat(firstOption) || []; }
+topicKeywords
+  = "(" ws* firstKeyword:topicKeyword ws* keywords:("," ws* keyword:topicKeyword ws* { return keyword; })* ws* ")"
+    { return [firstKeyword].concat(keywords); }
 
-topicflagvalues
-  = "keep"
-  / "nostay"
-  / "system"
-
-ordervalues
+orderValues
   = "ordered"
   / "random"
 
-keepvalues
+keepValues
   = "keep"
   / "exhaust"
 
-replyoption
-  = keepvalue:keepvalues { return { keep: keepvalue }; }
-  / ordervalue:ordervalues { return { order: ordervalue }; }
+stayValues
+  = "stay"
+  / "nostay"
 
-replyoptions
-  = "{" ws* firstOption:replyoption ws* options:("," ws* option:replyoption ws* { return option; })* ws* "}"
-    { return merge([firstOption].concat(options)); }
+systemValues
+  = "system"
+  / "nonsystem"
 
-topicflag
-  = ":" flag:topicflagvalues { return flag; }
+// The === below is used for flags that make sense as booleans.
 
-topicflags
-  = flag:topicflag* { return flag; }
+generalFlag
+  = keepValue:keepValues { return { keep: keepValue === "keep" }; }
+  / orderValue:orderValues { return { order: orderValue }; }
 
-topicoption
+topicFlag
+  = generalFlag
+  / stayValue:stayValues { return { stay: stayValue === "stay" }; }
+  / systemValue:systemValues { return { system: systemValue === "system" }; }
+
+// e.g. { keep, ordered }
+replyFlags
+  = "{" ws* firstFlag:generalFlag ws* flags:("," ws* flag:generalFlag ws* { return flag; })* ws* "}"
+    { return merge([firstFlag].concat(flags)); }
+
+gambitFlags
+  = "{" ws* firstFlag:generalFlag ws* flags:("," ws* flag:generalFlag ws* { return flag; })* ws* "}"
+    { return merge([firstFlag].concat(flags)); }
+
+topicFlags
+  = "{" ws* firstFlag:topicFlag ws* flags:("," ws* flag:topicFlag ws* { return flag; })* ws* "}"
+    { return merge([firstFlag].concat(flags)); }
+
+topicOption
   = filter:filter { return { filter }; }
-  / keywords:topickeywords { return { keywords }; }
-  / replyoptions:replyoptions { return { topic_globals: replyoptions }; }
+  / keywords:topicKeywords { return { keywords }; }
+  / topicFlags:topicFlags { return { flags: topicFlags }; }
 
-topicoptions
-  = options:(ws* option:topicoption { return option; })* ws*
+topicOptions
+  = options:(ws* option:topicOption { return option; })* ws*
     { return merge(options); }
 
 topic
-  = ws* "> topic"
-    flags:topicflags " "
+  = ws* "> topic "
     name:[a-zA-Z0-9_~]+
-    options:topicoptions? nl+
+    options:topicOptions? nl+
     gambits:gambits
     ws* "< topic"
     {
       return {
         name: name.join(""),
-        flags: flags,
-        keywords: options ? options.keywords : [],
-        filter: options ? options.filter : null,
-        globals: options ? options.topic_globals : {},
+        flags: (options && options.flags) || {},
+        keywords: (options && options.keywords) || [],
+        filter: (options && options.filter) || null,
         gambits
       };
     }
@@ -102,7 +113,7 @@ topic
     {
       return {
         name: "__pre__",
-        flags: ["keep"],
+        flags: { keep: true },
         keywords: [],
         filter: null,
         gambits
@@ -114,7 +125,7 @@ topic
     {
       return {
         name: "__post__",
-        flags: ["keep"],
+        flags: { keep: true },
         keywords: [],
         filter: null,
         gambits
@@ -131,19 +142,19 @@ redirect
   = ws* "@ " redirect:[a-zA-Z_ ]+ { return redirect.join(""); }
 
 trigger
-  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? tokens:[^\n\r]+
+  = ws* "+" ws+ filter:(filter:gambitFilter ws+ { return filter; })? ws? flags:replyFlags? tokens:[^\n\r]+
   {
     return {
-      reply_options,
+      flags,
       filter: filter,
-      question: null,
+      question: false,
       raw: tokens.join("")
     };
   }
-  / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? ws* tokens:[^\n\r]+
+  / ws* "?" ws+ filter:(filter:gambitFilter ws+ { return filter; })? ws? flags:replyFlags? ws* tokens:[^\n\r]+
   {
     return {
-      reply_options,
+      flags,
       filter: filter,
       question: true,
       raw: tokens.join("")
