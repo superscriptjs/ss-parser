@@ -1,6 +1,6 @@
 {
   const makeInteger = (int) => parseInt(int.join(""), 10);
-  const merge = (arr) => Object.assign({}, ...arr);
+  const merge = (arr) => Object.assign.apply({}, arr);
 }
 
 start
