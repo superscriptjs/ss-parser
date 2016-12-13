@@ -1,4 +1,4 @@
-> topic:system hello_world {random} (a b c) ^filter()
+> topic:system hello_world {random} (a, b, c) ^filter()
 + this is a trigger with a multiline response
 - hello this goes
 ^ over multiple lines

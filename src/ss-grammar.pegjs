@@ -52,7 +52,7 @@ topickeyword
   = keyword:[a-zA-Z_]+ { return keyword.join(""); }
 
 topickeywords
-  = "(" ws* keywords:(keyword:topickeyword ws* { return keyword; })* ")" { return keywords; }
+  = "(" ws* firstOption:topickeyword ws* options:("," ws* option:topickeyword ws* { return option; })* ws* ")" { return options.concat(firstOption) || []; }
 
 topicflagvalues
   = "keep" { return "keep"; }

@@ -36,7 +36,7 @@ describe('Should Parse Input', () => {
 
   it.only('Should parse comprehensive script of features', (done) => {
     parser.loadDirectory(`${__dirname}/fixtures/parserFeatures.ss`, (err, result) => {
-      console.log(JSON.stringify(result, null, 2));
+      // console.log(JSON.stringify(result, null, 2));
       done();
     });
   });
