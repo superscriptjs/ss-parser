@@ -2,6 +2,17 @@
   function makeInteger(o) {
     return parseInt(o.join(""), 10);
   }
+
+  function flattenArrayOfObjects(arr) {
+    var props = {};
+    if (arr && arr.length !== 0) {
+      for(var i = 0; i < arr.length; i++) {
+        var obj1 = arr[i];
+        for (var attrname in obj1) { props[attrname] = obj1[attrname]; }
+      }
+    }
+    return props;
+  }
 }
 
 start
@@ -71,9 +82,12 @@ topicflags
   = flag:topicflag* { return flag; }
 
 topicoptions
-  = ws+ filter:topicfilter ws* keywords:topickeywords? { return { keywords: keywords || [], filter: filter }; }
-  / ws+ keywords:topickeywords ws* filter:topicfilter? { return { keywords: keywords, filter: filter }; }
-
+  = ws+ reply_options:replyoptions ws* filter:topicfilter ws* keywords:topickeywords? {
+    return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options) };
+  }
+  / ws+ filter:topicfilter ws* keywords:topickeywords? { return { keywords: keywords || [], filter: filter, topic_globals: {} }; }
+  / ws+ keywords:topickeywords ws* filter:topicfilter? { return { keywords: keywords, filter: filter, topic_globals: {} }; }
+  
 topic
   = ws* "> topic"
     flags:topicflags " "
@@ -87,6 +101,7 @@ topic
         flags: flags,
         keywords: options ? options.keywords : [],
         filter: options ? options.filter : null,
+        globals: options ? options.topic_globals : {},
         gambits
       };
     }
@@ -125,21 +140,10 @@ redirect
   = ws* "@ " redirect:[a-zA-Z_ ]+ { return redirect.join(""); }
 
 trigger
-  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:(reply_options:replyoptions ws* { return reply_options; })* tokens:[^\n\r]+
+  = ws* "+" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? tokens:[^\n\r]+
   {
-    const flatten = list => list.reduce(
-        (a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []
-    );
-    var props = {};
-    if (reply_options && reply_options.length !== 0) {
-      reply_options = flatten(reply_options);
-      for(var i = 0; i < reply_options.length; i++) {
-        var obj1 = reply_options[i];
-        for (var attrname in obj1) { props[attrname] = obj1[attrname]; }
-      }
-    }
     return {
-      reply_options: props || {},
+      reply_options: flattenArrayOfObjects(reply_options),
       filter: filter,
       question: null,
       raw: tokens.join("")
@@ -147,18 +151,8 @@ trigger
   }
   / ws* "?" ws+ filter:(filter:gambitfilter ws+ { return filter; })? ws? reply_options:replyoptions? ws* tokens:[^\n\r]+
   {
-    const flatten = list => list.reduce(
-        (a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []
-    );
-    var props = {};
-    if (reply_options && reply_options.length !== 0) {
-      for(var i = 0; i < reply_options.length; i++) {
-        var obj1 = reply_options[i];
-        for (var attrname in obj1) { props[attrname] = obj1[attrname]; }
-      }
-    }
     return {
-      reply_options: props || {},
+      reply_options: flattenArrayOfObjects(reply_options),
       filter: filter,
       question: true,
       raw: tokens.join("")

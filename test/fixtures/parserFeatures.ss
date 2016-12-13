@@ -1,4 +1,4 @@
-> topic:keep hello_world ^test() (keywords ok)
+> topic hello_world {keep, ordered} ^test() (keywords ok) 
 + this is a trigger with a multiline response
 - hello this goes
 ^ over multiple lines
@@ -56,6 +56,6 @@ comment
 + {keep, ordered} test random
 - reply
 
-+ {ordered}{keep} test random 2
+? {ordered, keep} test random 2
 - reply
 
