@@ -82,12 +82,27 @@ topicflags
   = flag:topicflag* { return flag; }
 
 topicoptions
-  = ws+ reply_options:replyoptions ws* filter:topicfilter ws* keywords:topickeywords? {
-    return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options) };
-  }
-  / ws+ filter:topicfilter ws* keywords:topickeywords? { return { keywords: keywords || [], filter: filter, topic_globals: {} }; }
-  / ws+ keywords:topickeywords ws* filter:topicfilter? { return { keywords: keywords, filter: filter, topic_globals: {} }; }
+
+  // Any two  {random} + any other or {random} (a b c) ^filter()
+  = ws+ reply_options:replyoptions ws* keywords:topickeywords? ws* filter:topicfilter? 
+  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
+
+  // Any two  ^filter() + any other or ^filter() {random} (a b c)
+  / ws+ filter:topicfilter ws* reply_options:replyoptions? ws* keywords:topickeywords?
+  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
+
+  // Any two  {random} + any other or {random} ^filter() (a b c)
+  / ws+ reply_options:replyoptions ws* filter:topicfilter? ws* keywords:topickeywords?
+  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
   
+  // Any two  (a b c) + any other or (a b c) {random} ^filter()
+  / ws+ keywords:topickeywords ws* reply_options:replyoptions ws* filter:topicfilter?
+  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
+
+  // This will match one of any or {random} ^filter() (a b c) 
+  / ws+ reply_options:replyoptions? ws* filter:topicfilter? ws* keywords:topickeywords? 
+  { return { keywords: keywords || [], filter: filter, topic_globals: flattenArrayOfObjects(reply_options)};}
+
 topic
   = ws* "> topic"
     flags:topicflags " "
