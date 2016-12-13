@@ -132,7 +132,7 @@ const collapseRandomGambits = function collapseRandomGambits(data) {
     if (!randomTopic) {
       cleanData.topics.push({
         name: 'random',
-        flags: ['keep'],
+        flags: { keep: true },
         keywords: [],
         filter: null,
         gambits: [],
@@ -183,7 +183,7 @@ const processConversations = function processConversations(data) {
         gambit.conversation = triggerParser.parse(gambit.conversation.raw);
         // Add punctuation at the end so can still match replies that have punctuation
         const pattern = new RegExp(`^${gambit.conversation.clean}\\s*[?!.]*$`, 'i');
-        if (pattern.test(reply)) {
+        if (pattern.test(reply.string)) {
           repliesMatched.push(id);
         }
       });

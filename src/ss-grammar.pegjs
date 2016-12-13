@@ -36,6 +36,10 @@ gambitFilter
   = "{" ws* filter:filter ws* "}"
     { return filter; }
 
+replyFilter
+  = "{" ws* filter:filter ws* "}"
+    { return filter; }
+
 topicKeyword
   = keyword:[a-zA-Z_]+ { return keyword.join(""); }
 
@@ -61,22 +65,26 @@ systemValues
 
 // The === below is used for flags that make sense as booleans.
 
-generalFlag
+replyFlag
+  = keepValue:keepValues { return { keep: keepValue === "keep" }; }
+
+gambitFlag
   = keepValue:keepValues { return { keep: keepValue === "keep" }; }
   / orderValue:orderValues { return { order: orderValue }; }
 
 topicFlag
-  = generalFlag
+  = keepValue:keepValues { return { keep: keepValue === "keep" }; }
+  / orderValue:orderValues { return { order: orderValue }; }
   / stayValue:stayValues { return { stay: stayValue === "stay" }; }
   / systemValue:systemValues { return { system: systemValue === "system" }; }
 
-// e.g. { keep, ordered }
+// e.g. { keep, ordered, nostay, ... }
 replyFlags
-  = "{" ws* firstFlag:generalFlag ws* flags:("," ws* flag:generalFlag ws* { return flag; })* ws* "}"
+  = "{" ws* firstFlag:replyFlag ws* flags:("," ws* flag:replyFlag ws* { return flag; })* ws* "}"
     { return merge([firstFlag].concat(flags)); }
 
 gambitFlags
-  = "{" ws* firstFlag:generalFlag ws* flags:("," ws* flag:generalFlag ws* { return flag; })* ws* "}"
+  = "{" ws* firstFlag:gambitFlag ws* flags:("," ws* flag:gambitFlag ws* { return flag; })* ws* "}"
     { return merge([firstFlag].concat(flags)); }
 
 topicFlags
@@ -164,14 +172,26 @@ trigger
 replyExtension
   = nl ws* "^" ws+ string:[^\n\r]+ { return string.join(""); }
 
+replyOption
+  = filter:replyFilter { return { filter }; }
+  / topicFlags:topicFlags { return { flags: topicFlags }; }
+
+replyOptions
+  = options:(ws* option:replyOption { return option; })*
+    { return merge(options); }
+
 reply
-  = ws* "-" ws+ string:[^\n\r]+ replyExtension:replyExtension*
+  = ws* "-" options:replyOptions? ws+ string:[^\n\r]+ replyExtension:replyExtension*
     {
       var replyString = string.join("");
       if (replyExtension) {
-        replyExtension.forEach((extension) => replyString = replyString.concat(`${extension}`));
+        replyExtension.forEach((extension) => replyString = replyString.concat(extension));
       }
-      return replyString;
+      return {
+        string: replyString,
+        filter: (options && options.filter) || null,
+        keep: (options.flags && "keep" in options.flags) ? options.flags.keep : false
+      };
     }
 
 replies
