@@ -149,21 +149,29 @@ string
 redirect
   = ws* "@ " redirect:[a-zA-Z_ ]+ { return redirect.join(""); }
 
+triggerOption
+  = filter:gambitFilter { return { filter }; }
+  / flags:gambitFlags { return { flags }; }
+
+triggerOptions
+  = options:(ws* option:triggerOption { return option; })* ws*
+    { return merge(options); }
+
 trigger
-  = ws* "+" ws+ filter:(filter:gambitFilter ws+ { return filter; })? ws? flags:replyFlags? tokens:[^\n\r]+
+  = ws* "+" options:triggerOptions? tokens:[^\n\r]+
   {
     return {
-      flags,
-      filter: filter,
+      flags: (options && options.flags) || null,
+      filter: (options && options.filter) || null,
       question: false,
       raw: tokens.join("")
     };
   }
-  / ws* "?" ws+ filter:(filter:gambitFilter ws+ { return filter; })? ws? flags:replyFlags? ws* tokens:[^\n\r]+
+  / ws* "?" options:triggerOptions? ws* tokens:[^\n\r]+
   {
     return {
-      flags,
-      filter: filter,
+      flags: (options && options.flags) || null,
+      filter: (options && options.filter) || null,
       question: true,
       raw: tokens.join("")
     };
@@ -174,7 +182,7 @@ replyExtension
 
 replyOption
   = filter:replyFilter { return { filter }; }
-  / topicFlags:topicFlags { return { flags: topicFlags }; }
+  / flags:topicFlags { return { flags }; }
 
 replyOptions
   = options:(ws* option:replyOption { return option; })*
@@ -195,12 +203,8 @@ reply
     }
 
 replies
-  = reply2:reply replies:(nl reply:reply { return reply; })*
-    {
-      let set = replies || []
-      set.unshift(reply2);
-      return set;
-    }
+  = firstReply:reply replies:(nl reply:reply { return reply; })*
+    { return [firstReply].concat(replies); }
 
 conditional
   = ws* "%% (" string:[a-zA-Z0-9_= ]+ ")"
