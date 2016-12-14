@@ -54,7 +54,9 @@ comment
 // order = ['random', 'ordered']
 
 + {keep, ordered} test random
-- reply
+- reply 1
+- reply 2
+- reply 3
 
 ? {ordered, keep} test random 2
 - reply

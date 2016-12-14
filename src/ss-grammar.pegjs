@@ -197,8 +197,9 @@ reply
 replies
   = reply2:reply replies:(nl reply:reply { return reply; })*
     {
-      replies.push(reply2);
-      return replies;
+      let set = replies || []
+      set.unshift(reply2);
+      return set;
     }
 
 conditional
