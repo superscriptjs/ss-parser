@@ -161,7 +161,7 @@ trigger
   = ws* "+" options:triggerOptions? tokens:[^\n\r]+
   {
     return {
-      flags: (options && options.flags) || null,
+      flags: (options && options.flags) || {},
       filter: (options && options.filter) || null,
       question: false,
       raw: tokens.join("")
@@ -170,7 +170,7 @@ trigger
   / ws* "?" options:triggerOptions? ws* tokens:[^\n\r]+
   {
     return {
-      flags: (options && options.flags) || null,
+      flags: (options && options.flags) || {},
       filter: (options && options.filter) || null,
       question: true,
       raw: tokens.join("")
