@@ -261,7 +261,7 @@ gambit
     replies:replies
     {
       return {
-        trigger: { raw: "*", clean: "(?:.*\\s?)", filter: null, question: null },
+        trigger: { raw: "*", clean: "(?:.*)", filter: null, question: false, flags: {} },
         replies,
         conditional: [conditional],
         conversation
@@ -272,7 +272,7 @@ gambit
     redirect:redirect
     {
       return {
-        trigger: { raw: "*", clean: "(?:.*\\s?)" },
+        trigger: { raw: "*", clean: "(?:.*)", filter: null, question: false, flags: {} },
         redirect,
         conditional: [conditional],
         conversation
