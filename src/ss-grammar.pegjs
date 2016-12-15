@@ -189,7 +189,7 @@ replyOptions
     { return merge(options); }
 
 reply
-  = ws* "-" options:replyOptions? ws+ string:[^\n\r]+ replyExtension:replyExtension*
+  = ws* "-" options:replyOptions? ws* string:[^\n\r]+ replyExtension:replyExtension*
     {
       var replyString = string.join("");
       if (replyExtension) {
