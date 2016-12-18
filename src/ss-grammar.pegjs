@@ -54,6 +54,7 @@ orderValues
 keepValues
   = "keep"
   / "exhaust"
+  / "reload"
 
 stayValues
   = "stay"
@@ -66,14 +67,14 @@ systemValues
 // The === below is used for flags that make sense as booleans.
 
 replyFlag
-  = keepValue:keepValues { return { keep: keepValue === "keep" }; }
+  = keepValue:keepValues { return { keep: keepValue }; }
 
 gambitFlag
-  = keepValue:keepValues { return { keep: keepValue === "keep" }; }
+  = keepValue:keepValues { return { keep: keepValue }; }
   / orderValue:orderValues { return { order: orderValue }; }
 
 topicFlag
-  = keepValue:keepValues { return { keep: keepValue === "keep" }; }
+  = keepValue:keepValues { return { keep: keepValue }; }
   / orderValue:orderValues { return { order: orderValue }; }
   / stayValue:stayValues { return { stay: stayValue === "stay" }; }
   / systemValue:systemValues { return { system: systemValue === "system" }; }
