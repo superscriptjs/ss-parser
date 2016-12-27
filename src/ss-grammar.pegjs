@@ -103,7 +103,7 @@ topicOptions
 
 topic
   = ws* "> topic "
-    name:[a-zA-Z0-9_~]+
+    name:[a-zA-Z0-9_]+
     options:topicOptions? nl+
     gambits:gambits
     ws* "< topic"
