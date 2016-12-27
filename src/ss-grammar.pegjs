@@ -4,21 +4,23 @@
 }
 
 start
-  = data:(gambitsStart:gambits?
-      data:(topics:topics gambits:gambits? { return { topics, gambits }; })*
-      {
-        var topics = [];
-        var gambits = [];
-        data.forEach((data) => {
-          if (data.topics) data.topics.forEach((topic) => topics.push(topic));
-          if (data.gambits) data.gambits.forEach((gambit) => gambits.push(gambit));
-        });
-        if (gambitsStart) gambitsStart.forEach((gambit) => gambits.push(gambit));
-        return { topics, gambits };
+  = data:gambitsOrTopic*
+  {
+    const topics = [];
+    const gambits = [];
+    data.forEach((item) => {
+      if (item.type === 'gambits') {
+        item.payload.forEach(gambit => gambits.push(gambit));
+      } else if (item.type === 'topic') {
+        topics.push(item.payload);
       }
-    ) {
-      return data;
-    }
+    });
+    return { topics, gambits };
+  }
+
+gambitsOrTopic
+  = gambits:gambits { return { type: 'gambits', payload: gambits }; }
+  / topic:topic nlOrEOF { return { type: 'topic', payload: topic }; }
 
 argCharacter
   = "\\" char:[()] { return char; }
@@ -140,9 +142,6 @@ topic
         gambits
       };
     }
-
-topics
-  = topics:(topic:topic nl+ { return topic; })+ { return topics; }
 
 string
   = str:[a-zA-Z]+ { return { type: "string", val: str.join("")}; }
@@ -280,9 +279,8 @@ gambit
       };
     }
 
-
-gambitsBlock
-  = conditional:conditional ws* "{" nl+ gambits:(gambit:gambit nl+ { return gambit; })+ nl* ws* "}" nl+
+gambitBlock
+  = conditional:conditional ws* "{" nl+ gambits:(gambit:gambit nl+ { return gambit; })+ nl* ws* "}" nlOrEOF
     {
       gambits.forEach((gambit) => {
         if (gambit.conditional) {
@@ -293,20 +291,18 @@ gambitsBlock
       });
       return gambits;
     }
-    / gambits:(gambit:gambit nl+ { return gambit; })+
-      { return gambits; }
+  / gambits:(gambit:gambit nlOrEOF { return gambit; })+
+    { return gambits; }
 
 gambits
-  = gambitsBlock:gambitsBlock+
-    {
-      var returnedGambits = [];
-      gambitsBlock.forEach((gambitBlock) => {
-        gambitBlock.forEach((gambit) => {
-          returnedGambits.push(gambit);
-        });
-      });
-      return returnedGambits;
-    }
+  = gambitBlocks:gambitBlock+
+  {
+    let gambits = [];
+    gambitBlocks.forEach((gambitBlock) => {
+      gambits = gambits.concat(gambitBlock);
+    });
+    return gambits;
+  }
 
 integer "integer"
   = digits:[0-9]+ { return makeInteger(digits); }
@@ -314,3 +310,7 @@ integer "integer"
 ws "whitespace" = [ \t]
 
 nl "newline" = [\n\r]
+
+nlOrEOF
+  = nl+
+  / !.
