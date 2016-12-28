@@ -132,7 +132,7 @@ const collapseRandomGambits = function collapseRandomGambits(data) {
     if (!randomTopic) {
       cleanData.topics.push({
         name: 'random',
-        flags: { keep: true },
+        flags: { keep: 'keep' },
         keywords: [],
         filter: null,
         gambits: [],

@@ -124,7 +124,7 @@ topic
     {
       return {
         name: "__pre__",
-        flags: { keep: true },
+        flags: { keep: "keep" },
         keywords: [],
         filter: null,
         gambits
@@ -136,7 +136,7 @@ topic
     {
       return {
         name: "__post__",
-        flags: { keep: true },
+        flags: { keep: "keep" },
         keywords: [],
         filter: null,
         gambits
