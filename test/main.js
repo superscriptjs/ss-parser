@@ -14,7 +14,8 @@ const findByTrigger = function findByTrigger(data, raw) {
 
 describe('Should Parse Input', () => {
   it('Should be an object', (done) => {
-    parser.loadDirectory(`${__dirname}/fixtures/main.ss`, (err, result) => {
+    parser.parseDirectory(`${__dirname}/fixtures/main`, (err, result) => {
+      should.not.exist(err);
       // Should have the following keys
       should(Object.keys(result)).eql(['topics', 'gambits', 'replies', 'checksums', 'version']);
 
@@ -35,8 +36,8 @@ describe('Should Parse Input', () => {
   });
 
   it('Should parse comprehensive script of features', (done) => {
-    parser.loadDirectory(`${__dirname}/fixtures/parserFeatures.ss`, (err, result) => {
-      // console.log(JSON.stringify(result, null, 2));
+    parser.parseDirectory(`${__dirname}/fixtures/parserFeatures`, (err, result) => {
+      should.not.exist(err);
       done();
     });
   });

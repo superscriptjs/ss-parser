@@ -1,6 +1,6 @@
 {
   "name": "ss-parser",
-  "version": "1.0.0-alpha16",
+  "version": "1.0.0-alpha17",
   "description": "The parser interface for SuperScript",
   "main": "./lib/index.js",
   "repository": {
@@ -21,11 +21,11 @@
     "async-replace": "^1.0.1",
     "bot-lang": "^1.0.7",
     "checksum": "^0.1.1",
-    "debug": "^2.5.1",
-    "lodash": "^4.17.2",
+    "debug": "^2.6.0",
+    "glob": "^7.1.1",
+    "lodash": "^4.17.3",
     "pegjs": "^0.10.0",
-    "recursive-readdir": "^2.1.0",
-    "wordpos": "^1.1.1"
+    "wordpos": "^1.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",

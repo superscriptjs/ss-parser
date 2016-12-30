@@ -10,15 +10,15 @@ More information can be found at [superscriptjs.com](http://superscriptjs.com)
 
 # API
 
-* `loadDirectory(path, options, callback)`
+* `parseDirectory(path, options, callback)`
 
 Takes a directory path and parses all the `*.ss` files in the directory, creating a JSON structure which is passed into callback as `callback(err, results)`. The `options` parameter is an object that can accept a factSystem for use in trigger and reply expansion, and a cache to skip previously parsed files in a directory.
 
-* `parseFile(fileName, factSystem, callback)`
+* `parseFile(path, factSystem, callback)`
 
 Like `loadDirectory`, but parses a single `*.ss` file.
 
-* `parseContents(file, factSystem, callback)`
+* `parseContents(path, factSystem, callback)`
 
 Like `parseFile`, but parses a string (i.e. the contents of a single file).
 

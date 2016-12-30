@@ -132,7 +132,7 @@ const collapseRandomGambits = function collapseRandomGambits(data) {
     if (!randomTopic) {
       cleanData.topics.push({
         name: 'random',
-        flags: { keep: 'keep' },
+        flags: { keep: true },
         keywords: [],
         filter: null,
         gambits: [],
@@ -201,17 +201,17 @@ const postprocess = function postprocess(data, factSystem, callback) {
   normalizeTriggers(cleanData, factSystem, callback);
 };
 
-const parseContents = function parseContents(code, fileName, factSystem, callback) {
+const parseContents = function parseContents(code, factSystem, callback) {
   // Maintain backward compat.
-  if (arguments.length === 3) {
+  if (arguments.length === 2) {
     callback = factSystem;
-    factSystem = fileName;
-    fileName = 'Unknown File';
+    factSystem = {};
   }
 
   if (code.trim() === '') {
     return callback(null, {});
   }
+
   const preprocessed = preprocess(code);
   try {
     const parsed = parser.parse(preprocessed);
@@ -221,12 +221,11 @@ const parseContents = function parseContents(code, fileName, factSystem, callbac
       callback(err, postprocessed);
     });
   } catch (e) {
-    console.log('Error in parser');
-    console.log('Found:', e.found);
-    console.log(e.message);
-    console.log("Line: '%s'", preprocessed.split('\n')[e.location.start.line]);
-    console.log("File: '%s'", fileName);
-    callback('PegParseError');
+    let errString = 'Error in parser\n';
+    errString += `Found: ${e.found}\n`;
+    errString += `Message: ${e.message}\n`;
+    errString += `Line: '${preprocessed.split('\n')[e.location.start.line]}'`;
+    callback(errString);
   }
 };
 

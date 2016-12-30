@@ -2,7 +2,7 @@ import fs from 'fs';
 import async from 'async';
 import _ from 'lodash';
 import checksum from 'checksum';
-import recursive from 'recursive-readdir';
+import glob from 'glob';
 
 import { parseContents, normalizeTrigger } from './parseContents';
 
@@ -10,18 +10,57 @@ import { parseContents, normalizeTrigger } from './parseContents';
 // supported version number in SuperScript
 const VERSION_NUMBER = 1;
 
-const parseFile = function parseFile(fileName, factSystem, callback) {
-  fs.readFile(fileName, 'utf-8', (err, contents) => {
+const parseFile = function parseFile(path, factSystem, callback) {
+  const startTime = Date.now();
+  fs.readFile(path, 'utf-8', (err, contents) => {
     if (err) {
-      console.error(`Error reading file: ${err}`);
+      return callback(`Error reading file: ${err}`);
     }
-    parseContents(contents, fileName, factSystem, callback);
+    return parseContents(contents, factSystem, (err, parsed) => {
+      if (err) {
+        return callback(`Error whilst processing file: ${path}\n${err}`);
+      }
+      parsed.version = VERSION_NUMBER;
+      console.log(`Time to process file ${path}: ${(Date.now() - startTime) / 1000} seconds`);
+      return callback(err, parsed);
+    });
   });
 };
 
-// A path of files to load
+const findFilesToProcess = function findFilesToProcess(path, cache, callback) {
+  glob(`${path}/**/*.ss`, (err, files) => {
+    if (err) {
+      return callback(err);
+    }
+
+    const checksums = {};
+    const checkInCache = (file, next) => {
+      checksum.file(file, (err, sum) => {
+        if (err) {
+          return next(err);
+        }
+
+        checksums[file] = sum;
+        if (cache[file]) {
+          return next(null, cache[file] !== sum);
+        }
+        return next(null, true);
+      });
+    };
+
+    // Filters out files that have been cached already
+    return async.filter(files, checkInCache, (err, filesToLoad) => {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, filesToLoad, checksums);
+    });
+  });
+};
+
 // Cache is a key:sum of files
-const loadDirectory = function loadDirectory(path, options, callback) {
+const parseDirectory = function parseDirectory(path, options, callback) {
   if (_.isFunction(options)) {
     callback = options;
     options = {};
@@ -33,87 +72,57 @@ const loadDirectory = function loadDirectory(path, options, callback) {
 
   const startTime = new Date().getTime();
 
-  recursive(path, (err, files) => {
-    if (err && err.code === 'ENOTDIR') {
-      files = [path];
-    } else if (err) {
-      console.error(err);
+  findFilesToProcess(path, cache, (err, files, checksums) => {
+    if (err) {
+      return callback(err);
     }
 
-    const checksums = {};
-    const itor = (file, next) => {
-      if (file.match(/\.(ss)$/i)) {
-        checksum.file(file, (err, sum) => {
-          if (err) {
-            next(err);
-          }
-
-          checksums[file] = sum;
-          if (cache[file]) {
-            if (cache[file] !== sum) {
-              next(null, true);
-            } else {
-              next(null, false);
-            }
-          } else {
-            next(null, true);
-          }
-        });
-      } else {
-        next(null, false);
+    return async.map(files, (fileName, callback) => {
+      parseFile(fileName, factSystem, callback);
+    }, (err, res) => {
+      if (err) {
+        return callback(err);
       }
-    };
 
-    // Filters out files that have been cached already
-    async.filter(files, itor, (err, filesToLoad) => {
-      async.map(filesToLoad, (fileName, callback) => {
-        parseFile(fileName, factSystem, callback);
-      }, (err, res) => {
-        if (err) {
-          console.error(err);
-        }
+      let topics = {};
+      let gambits = {};
+      let replies = {};
 
-        let topics = {};
-        let gambits = {};
-        let replies = {};
+      for (let i = 0; i < res.length; i++) {
+        topics = _.merge(topics, res[i].topics);
+        gambits = _.merge(gambits, res[i].gambits);
+        replies = _.merge(replies, res[i].replies);
+      }
 
-        for (let i = 0; i < res.length; i++) {
-          topics = _.merge(topics, res[i].topics);
-          gambits = _.merge(gambits, res[i].gambits);
-          replies = _.merge(replies, res[i].replies);
-        }
+      const data = {
+        topics,
+        gambits,
+        replies,
+        checksums,
+        version: VERSION_NUMBER,
+      };
 
-        const data = {
-          topics,
-          gambits,
-          replies,
-          checksums,
-          version: VERSION_NUMBER,
-        };
+      const topicCount = Object.keys(topics).length;
+      const gambitsCount = Object.keys(gambits).length;
+      const repliesCount = Object.keys(replies).length;
 
-        const endTime = new Date().getTime();
-        const topicCount = Object.keys(topics).length;
-        const gambitsCount = Object.keys(gambits).length;
-        const repliesCount = Object.keys(replies).length;
+      console.log(`Total time to process: ${(Date.now() - startTime) / 1000} seconds`);
+      // console.log("Number of topics %s parsed.", topicCount);
+      // console.log("Number of gambits %s parsed.", gambitsCount);
+      // console.log("Number of replies %s parsed.", repliesCount);
 
-        console.log(`Time to Process: ${(endTime - startTime) / 1000} seconds`);
-        // console.log("Number of topics %s parsed.", topicCount);
-        // console.log("Number of gambits %s parsed.", gambitsCount);
-        // console.log("Number of replies %s parsed.", repliesCount);
+      if (topicCount !== 0 && gambitsCount !== 0 && repliesCount !== 0) {
+        return callback(null, data);
+      }
 
-        if (topicCount === 0 && gambitsCount === 0 && repliesCount === 0) {
-          callback(null, {});
-        } else {
-          callback(null, data);
-        }
-      });
+      return callback(null, {});
     });
   });
 };
 
 export default {
   normalizeTrigger,
-  parseFile,
   parseContents,
-  loadDirectory,
+  parseDirectory,
+  parseFile,
 };
