@@ -68,12 +68,12 @@ const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, 
       }
 
       words = words.map(item => item.replace(/_/g, ' '));
-      words.push(word);
 
       if (_.isEmpty(words)) {
         debug(`Creating a trigger with a concept not expanded: ${match}`);
         done(null, match);
       } else {
+        words.push(word);
         words = `(?=^|\\s)\\s*(${words.join('|')})(?=\\s|$)\\s*`;
         done(null, words);
       }
@@ -86,9 +86,8 @@ const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, 
           console.log(err);
         }
 
-        words.push(word);
-
         if (!_.isEmpty(words)) {
+          words.push(word);
           words = `(?=^|\\s)\\s*(${words.join('|')})(?=\\s|$)\\s*`;
           done(null, words);
         } else {
