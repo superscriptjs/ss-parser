@@ -61,20 +61,20 @@ const preprocess = function preprocess(code) {
 };
 
 const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, callback) {
-  const wordnetReplace = function wordnetReplace(match, sym, word, p3, offset, done) {
-    const wordnetLookup = () => wordnet.lookup(word, sym, (err, words) => {
+  const wordnetReplace = function wordnetReplace(match, word, p2, offset, done) {
+    const wordnetLookup = () => wordnet.lookup(word, '~', (err, words) => {
       if (err) {
         console.log(err);
       }
 
-      // TODO: add a space around the terms
       words = words.map(item => item.replace(/_/g, ' '));
+      words.push(word);
 
       if (_.isEmpty(words)) {
         debug(`Creating a trigger with a concept not expanded: ${match}`);
         done(null, match);
       } else {
-        words = `(\\b${words.join('\\b|\\b')}\\b)`;
+        words = `(?=^|\\s)\\s*(${words.join('|')})(?=\\s|$)\\s*`;
         done(null, words);
       }
     });
@@ -86,8 +86,10 @@ const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, 
           console.log(err);
         }
 
+        words.push(word);
+
         if (!_.isEmpty(words)) {
-          words = `(\\b${words.join('\\b|\\b')}\\b)`;
+          words = `(?=^|\\s)\\s*(${words.join('|')})(?=\\s|$)\\s*`;
           done(null, words);
         } else {
           // Nothing found in fact system, use wordnet lookup.
@@ -100,7 +102,7 @@ const expandWordnetTrigger = function expandWordnetTrigger(trigger, factSystem, 
     return wordnetLookup();
   };
 
-  replace(trigger, /(~)(\w[\w]+)/g, wordnetReplace, callback);
+  replace(trigger, /\s*~(\w+)\s*/g, wordnetReplace, callback);
 };
 
 const normalizeTrigger = function normalizeTrigger(trigger, factSystem, callback) {

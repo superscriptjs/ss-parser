@@ -16,9 +16,8 @@ start
   = trigger
 
 star
-  = "*" { return { raw: "*", clean: "(?:(?:^|\\s)(?:.*)(?:\\s|$))?" }; }
-  / "[" ws* "*" ws* "]" { return { raw: "[*]", clean: "(?:(?:^|\\s)(?:.*)(?:\\s|$))?" }; }
-  / "(" ws* "*" ws* ")" { return { raw: "(*)", clean: "(?:^|\\s)(.*)(?:\\s|$)" }; }
+  = "*" { return { raw: "*", clean: "(?:(?=^|\\s)\\s*(?:.*)(?=\\s|$)\\s*)?" }; }
+  / "(" ws* "*" ws* ")" { return { raw: "(*)", clean: "(?=^|\\s)\\s*(.*)(?=\\s|$)\\s*" }; }
 
 // As far as I can tell: * and [*] are equivalent and can be empty, while (*) cannot
 // match to an empty string.
@@ -40,36 +39,32 @@ string
   = str:[a-zA-Z]+ { return { type: "string", val: str.join("")}; }
 
 cleanedString
-  = strings:(wsl:ws* string:[^|()\[\]\n\r \t*]+ wsr:ws* { return { raw: `${wsl.join("")}${string.join("")}${wsr.join("")}`, clean: `${string.join("")}` }; })+
-    {
-      return {
-        raw: strings.map((string) => string.raw).join(""),
-        clean: strings.map((string) => string.clean).join(" ")
-      };
-    }
+  = wsl:ws* string:[^|()\[\]\n\r*]+ wsr:ws* { return string.join(""); }
 
 alternates
-  = "(" alternates:(cleanedString:cleanedString "|" { return { raw: `${cleanedString.raw}|`, clean: `${cleanedString.clean}|` }; })+ alternate:cleanedString ")"
+  = "(" alternate:cleanedString alternates:("|" cleanedString:cleanedString { return cleanedString; } )+ ")"
     {
+      const cleaned = [alternate].concat(alternates).join("|");
       return {
-        raw: `(${alternates.map((alternate) => alternate.raw).join("").concat(alternate.raw)})`,
-        clean: `(?:\\s|^)(${alternates.map((alternate) => alternate.clean).join("").concat(alternate.clean)})(?:\\s|$)`
+        raw: `(${cleaned})`,
+        clean: `(?=^|\\s)\\s*(${cleaned})(?=\\s|$)\\s*`
       };
     }
 
 optionals
-  = "[" alternates:(cleanedString:cleanedString "|" { return { raw: `${cleanedString.raw}|`, clean: `\\s*${cleanedString.clean}\\s*|` }; })* alternate:cleanedString "]"
+  = "[" optional:cleanedString optionals:("|" cleanedString:cleanedString { return cleanedString; } )* "]"
     {
+      const cleaned = [optional].concat(optionals).join("|");
       return {
-        raw: `[${alternates.map((alternate) => alternate.raw).join("").concat(alternate.raw)}]`,
-        clean: `(?:${alternates.map((alternate) => alternate.clean).join("").concat(`\\s*${alternate.clean}\\s*|\\s*`)})`
+        raw: `[${cleaned}]`,
+        clean: `(?:(?=^|\\s)\\s*(?:${cleaned})(?=\\s|$)\\s*)?`
       };
     }
   / "[" ws* "*" ws* "]"
     {
       return {
         raw: "[*]",
-        clean: "(?:.*\\s?)"
+        clean: "(?:(?=^|\\s)\\s*(?:.*)(?=\\s|$)\\s*)?"
       };
     }
 

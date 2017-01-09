@@ -211,11 +211,11 @@ conditional
       { return string.join(""); }
 
 star
-  = "*" { return { raw: "*", clean: "(?:(?:^|\\s)(?:.*)(?:\\s|$))?" }; }
+  = "*" { return { raw: "*", clean: "(?:(?=^|\\s)\\s*(?:.*)(?=\\s|$)\\s*)?" }; }
 
 conversationTokens
   = string:[^*\n\r \t]+
-    { return { raw: string.join(""), clean: `${string.join("")}\\b` };}
+    { return { raw: string.join(""), clean: `${string.join("")}` };}
   / wsl:ws* star:star wsr:ws*
     { return { raw: ` ${star.raw} `, clean: star.clean }; }
   / ws:ws { return { raw: ws, clean: ws }; }

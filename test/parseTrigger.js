@@ -63,6 +63,8 @@ const test = [
   { test: 'fine', input: '[*] (fine|good) [*]' },
   { test: 'ok fine', input: '[*] (fine|good) [*]' },
   { test: 'sure fine okay', input: '[*] (fine|good) [*]' },
+  { test: 'surefine okay', input: '[*](fine|good) [*]', assert: false },
+  { test: '', input: '[*]' },
 
   { test: 'please help me', input: '* help *' },
   { test: 'please help me', input: '* (help) *' },
@@ -87,6 +89,12 @@ const test = [
 
   { test: 'this test is to check if alternates are fine', input: 'this test is to (see|check|determine) if alternates are (fine|working|good)' },
   { test: 'this test is to checkif alternates are working', input: 'this test is to (see|check|determine)if alternates are (fine|working|good)', assert: false },
+  { test: 'what about close to another', input: 'what (if|about)(near|close) to another' },
+  { test: 'what ifnear to another', input: 'what (if|about)(near|close) to another', assert: false },
+
+  { test: 'I like wordnet', input: 'I ~like wordnet' },
+  { test: 'I love wordnet', input: 'I ~like wordnet' },
+  { test: 'sport great', input: '~sport [is] (fun|great)' },
 ];
 
 describe('Regex Reply Parse', () => {
