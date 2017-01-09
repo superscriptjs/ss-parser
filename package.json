@@ -1,6 +1,6 @@
 {
   "name": "ss-parser",
-  "version": "1.0.0-alpha19",
+  "version": "1.0.0-alpha20",
   "description": "The parser interface for SuperScript",
   "main": "./lib/index.js",
   "repository": {
@@ -19,7 +19,7 @@
   "dependencies": {
     "async": "^2.1.4",
     "async-replace": "^1.0.1",
-    "bot-lang": "^1.0.9",
+    "bot-lang": "^1.0.10",
     "checksum": "^0.1.1",
     "debug": "^2.6.0",
     "glob": "^7.1.1",

@@ -49,16 +49,16 @@ cleanedString
     }
 
 alternates
-  = "(" alternates:(cleanedString:cleanedString "|" { return { raw: `${cleanedString.raw}|`, clean: `\\b${cleanedString.clean}\\b|` }; })+ alternate:cleanedString  ")"
+  = "(" alternates:(cleanedString:cleanedString "|" { return { raw: `${cleanedString.raw}|`, clean: `${cleanedString.clean}|` }; })+ alternate:cleanedString ")"
     {
       return {
         raw: `(${alternates.map((alternate) => alternate.raw).join("").concat(alternate.raw)})`,
-        clean: `(${alternates.map((alternate) => alternate.clean).join("").concat(`\\b${alternate.clean}\\b`)})\\s?`
+        clean: `(?:\\s|^)(${alternates.map((alternate) => alternate.clean).join("").concat(alternate.clean)})(?:\\s|$)`
       };
     }
 
 optionals
-  = "[" alternates:(cleanedString:cleanedString "|" { return { raw: `${cleanedString.raw}|`, clean: `\\s*${cleanedString.clean}\\s*|` }; })* alternate:cleanedString  "]"
+  = "[" alternates:(cleanedString:cleanedString "|" { return { raw: `${cleanedString.raw}|`, clean: `\\s*${cleanedString.clean}\\s*|` }; })* alternate:cleanedString "]"
     {
       return {
         raw: `[${alternates.map((alternate) => alternate.raw).join("").concat(alternate.raw)}]`,
@@ -77,8 +77,8 @@ EOF
   = !.
 
 triggerTokens
-  = alternates:alternates
-    { return alternates; }
+  = wsl:ws* alternates:alternates wsr:ws*
+    { return { raw: `${wsl.join("")}${alternates.raw}${wsr.join("")}`, clean: alternates.clean } }
   / wsl:ws* optionals:optionals wsr:ws*
     { return { raw: `${wsl.join("")}${optionals.raw}${wsr.join("")}`, clean: optionals.clean } }
   / wsl:ws* starn:starn wsr:ws*

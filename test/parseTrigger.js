@@ -84,6 +84,9 @@ const test = [
   { test: '*', input: '\\*' },
   { test: '__test__', input: '__test__' },
   { test: 'redirect testconversation trigger two', input: 'redirect *1 (*)' },
+
+  { test: 'this test is to check if alternates are fine', input: 'this test is to (see|check|determine) if alternates are (fine|working|good)' },
+  { test: 'this test is to checkif alternates are working', input: 'this test is to (see|check|determine)if alternates are (fine|working|good)', assert: false },
 ];
 
 describe('Regex Reply Parse', () => {
