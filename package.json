@@ -1,34 +1,44 @@
 {
   "name": "ss-parser",
-  "version": "0.5.0",
+  "version": "1.0.0-alpha22",
   "description": "The parser interface for SuperScript",
   "main": "./lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superscriptjs/ss-parser"
+  },
   "scripts": {
-    "lint": "eslint --env node lib *.js",
-    "test": "mocha test -R spec -s 1700 -t 150000",
-    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec test -s 1700 -t 150000"
+    "build": "babel src --out-dir lib --copy-files",
+    "prepublish": "npm run build",
+    "test": "mocha --compilers js:babel-register test -R spec -t 30000",
+    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --compilers js:babel-register -R spec test -s 1700 -t 30000"
   },
   "author": "Rob Ellis",
   "license": "MIT",
-  "homepage": "https://github.com/silentrob/ss-parser",
+  "homepage": "https://github.com/superscriptjs/ss-parser",
   "dependencies": {
-    "wordnet-db": "^3.1.2",
-    "async": "^1.5.2",
+    "async": "^2.1.4",
     "async-replace": "^1.0.1",
+    "bot-lang": "^1.0.10",
     "checksum": "^0.1.1",
-    "debug": "^2.2.0",
-    "deepmerge": "^0.2.10",
-    "eslint": "^2.8.0",
-    "lodash": "^4.11.1",
-    "natural": "^0.4.0",
-    "node-normalizer": "^0.1.4",
-    "sfacts": "^0.2.0",
-    "wordnet": "^0.1.2"
+    "debug": "^2.6.0",
+    "glob": "^7.1.1",
+    "lodash": "^4.17.4",
+    "pegjs": "^0.10.0",
+    "wordpos": "^1.1.2"
   },
   "devDependencies": {
-    "coveralls": "^2.11.9",
-    "istanbul": "^0.4.3",
-    "mocha": "^2.4.5",
-    "should": "^8.3.1"
+    "babel-cli": "^6.16.0",
+    "babel-preset-env": "^1.1.6",
+    "babel-register": "^6.18.0",
+    "coveralls": "^2.11.15",
+    "eslint": "^3.9.1",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.6.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^3.2.0",
+    "should": "^11.1.2"
   }
 }

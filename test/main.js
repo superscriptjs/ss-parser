@@ -1,36 +1,43 @@
-var mocha = require("mocha");
-var should = require("should");
+/* global describe, it */
 
-var parse = require("../lib/")();
+import should from 'should/as-function';
 
-var findByTrigger = function(data, raw) {
-  for (var gam in data.gambits) {
-    if (data.gambits[gam].raw === raw) {
+import parser from '../src';
+
+const findByTrigger = function findByTrigger(data, raw) {
+  for (const gam in data.gambits) {
+    if (data.gambits[gam].trigger.raw === raw) {
       return data.gambits[gam];
     }
   }
-}
+};
 
-describe('Should Parse Input', function() {
-  it("Should be an object", function (done) {
-    parse.loadDirectory('./test/fixtures/main.ss', function(err, result) {
-
+describe('Should Parse Input', () => {
+  it('Should be an object', (done) => {
+    parser.parseDirectory(`${__dirname}/fixtures/main`, (err, result) => {
+      should.not.exist(err);
       // Should have the following keys
-      ['topics', 'gambits', 'convos', 'replys', 'checksums'].should.eql(Object.keys(result));
+      should(Object.keys(result)).eql(['topics', 'gambits', 'replies', 'checksums', 'version']);
 
       // We should have 4 topics
-      ['random', '__pre__', '__post__', 'random2'].should.eql(Object.keys(result.topics));
+      should(Object.keys(result.topics)).eql(['__pre__', '__post__', 'random2', 'random']);
 
       // We should have some gambits
-      Object.keys(result.gambits).should.have.length(35);
-      Object.keys(result.replys).should.have.length(36);
+      should(Object.keys(result.gambits)).have.length(35);
+      should(Object.keys(result.replies)).have.length(36);
 
       // Lets make sure we have a conversations array as well
-      var key = Object.keys(result.gambits).pop();
-      result.gambits[key].options.conversations.should.have.length(3);
-      findByTrigger(result, "this is in pre").topic.should.eql("__pre__");
-      // console.log(result)
+      const key = Object.keys(result.gambits).pop();
+      should(result.gambits[key].conversation).have.length(3);
+      should(findByTrigger(result, 'this is in pre').topic).eql('__pre__');
 
+      done();
+    });
+  });
+
+  it('Should parse comprehensive script of features', (done) => {
+    parser.parseDirectory(`${__dirname}/fixtures/parserFeatures`, (err, result) => {
+      should.not.exist(err);
       done();
     });
   });
