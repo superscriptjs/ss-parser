@@ -95,6 +95,9 @@ const test = [
   { test: 'I like wordnet', input: 'I ~like wordnet' },
   { test: 'I love wordnet', input: 'I ~like wordnet' },
   { test: 'sport great', input: '~sport [is] (fun|great)' },
+
+  { test: 'test things', input: 'test [multiple] [awesome|great] things' },
+  { test: 'awesome optionals', input: '[test] [multiple] (awesome|great) [optionals]' },
 ];
 
 describe('Regex Reply Parse', () => {

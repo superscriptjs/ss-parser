@@ -57,14 +57,14 @@ optionals
       const cleaned = [optional].concat(optionals).join("|");
       return {
         raw: `[${cleaned}]`,
-        clean: `(?:(?=^|\\s)\\s*(?:${cleaned})(?=\\s|$)\\s*)?`
+        clean: `(?:(?:\\s|\\b)+(?:${cleaned})(?:\\s|\\b)+|(?:\\s|\\b)+)`
       };
     }
   / "[" ws* "*" ws* "]"
     {
       return {
         raw: "[*]",
-        clean: "(?:(?=^|\\s)\\s*(?:.*)(?=\\s|$)\\s*)?"
+        clean: "(?:(?:(?:\\s|\\b)+(?:.*)(?:\\s|\\b)+|(?:\\s|\\b)+)|)"
       };
     }
 
