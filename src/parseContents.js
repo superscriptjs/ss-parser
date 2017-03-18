@@ -32,18 +32,12 @@ const removeComments = function removeComments(code) {
   const lines = code.split('\n');
   let cleanedLines = lines.map((line) => {
     let index = line.indexOf('//');
-    let keepChecking = true;
-    let testIndex = index;
-    while (testIndex !== -1 && keepChecking) {
-      keepChecking = line.charAt(index - 1) === ':';
-      if (keepChecking) {
-        testIndex = line.substr(index + 2).indexOf('//');
-        if (testIndex !== -1) {
-          index += testIndex - 2;
-        }
+    while (index !== -1) {
+      if (line.charAt(index - 1) !== ':') {
+        return line.substr(0, index);
       }
+      index = line.indexOf('//', index + 2);
     }
-    if (index !== -1) return line.substr(0, index);
     return line;
   });
   cleanedLines = cleanedLines.join('\n');
