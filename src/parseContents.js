@@ -31,9 +31,12 @@ const removeComments = function removeComments(code) {
   // Remove comments from script (e.g. // this is a comment)
   const lines = code.split('\n');
   let cleanedLines = lines.map((line) => {
-    const comment = line.indexOf('//');
-    if (comment !== -1) {
-      return line.substr(0, comment);
+    let index = line.indexOf('//');
+    while (index !== -1) {
+      if (line.charAt(index - 1) !== ':') {
+        return line.substr(0, index);
+      }
+      index = line.indexOf('//', index + 2);
     }
     return line;
   });
