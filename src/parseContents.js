@@ -187,7 +187,7 @@ const processConversations = function processConversations(data) {
         gambit.conversation = triggerParser.parse(gambit.conversation.raw);
         // Add punctuation at the end so can still match replies that have punctuation
         const pattern = new RegExp(`^${gambit.conversation.clean}\\s*[?!.]*$`, 'i');
-        if (pattern.test(reply.string)) {
+        if (pattern.test(reply.string.replace(/\\n/g, ' '))) {
           repliesMatched.push(id);
         }
       });
